@@ -1,4 +1,7 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# AweXM
+AweXM is (soon to be) a tracker for the .xm (eXtended Module) sample-based music format, written for my uni's OOP course. Its spec is described in this [gist](https://github.com/milkytracker/MilkyTracker/blob/master/resources/reference/xm-form.txt).
+
+Below is the rest of the original template's README, in Romanian.
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
