@@ -7,24 +7,36 @@
 
 class XMHeader {
 private:
-	// nu stocam                  id_text;
-	std::array<char, 20>          module_name;
-	std::array<char, 20>          tracker_name;
-	std::array<std::uint8_t, 2>   version_number;
-	std::uint32_t                 header_size;
-	std::uint16_t                 song_length;
-	std::uint16_t                 song_restart_position;
-	std::uint16_t                 number_of_channels;
-	std::uint16_t                 number_of_patterns;
-	std::uint16_t                 number_of_instruments;
-	bool                          flags_field;
-	std::uint16_t                 default_tempo;
-	std::uint16_t                 default_bpm;
-	std::array<std::uint8_t, 256> pattern_order_table;
+	using char17  = std::array<char, 17>;
+	using char20  = std::array<char, 20>;
+	using byte256 = std::array<std::uint8_t, 256>;
+#define XMHEADER_ENTRIES \
+	X(char17,        id_text)               \
+	X(char20,        module_name)           \
+	X(std::uint8_t,  always_1a)             \
+	X(char20,        tracker_name)          \
+	X(std::uint16_t, version_number)        \
+	X(std::uint32_t, header_size)           \
+	X(std::uint16_t, song_length)           \
+	X(std::uint16_t, song_restart_position) \
+	X(std::uint16_t, number_of_channels)    \
+	X(std::uint16_t, number_of_patterns)    \
+	X(std::uint16_t, number_of_instruments) \
+	X(std::uint16_t, flags_field)           \
+	X(std::uint16_t, default_tempo)         \
+	X(std::uint16_t, default_bpm)           \
+	X(byte256,       pattern_order_table)
+#define X(T, name) T name;
+	XMHEADER_ENTRIES
+#undef X
 public:
-	XMHeader() = delete;
-	friend std::istream &operator>>(std::istream&, XMHeader const&);
-	friend std::ostream &operator<<(std::ostream&, XMHeader const&);
+	XMHeader(XMHeader const& rhs) {
+#define X(T, name) name = rhs.name;
+		XMHEADER_ENTRIES
+#undef X
+	}
+	friend std::istream &operator>>(std::istream&, XMHeader&);
+	friend std::ostream &operator<<(std::ostream&, const XMHeader&);
 };
 
 #endif // XMHEADER_HPP
