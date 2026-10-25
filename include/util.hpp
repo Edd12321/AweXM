@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <istream>
 #include <vector>
+#include <type_traits>
 
 template<typename T>
 struct has_data {

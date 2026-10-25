@@ -10,7 +10,7 @@ private:
 	using char17  = std::array<char, 17>;
 	using char20  = std::array<char, 20>;
 	using byte256 = std::array<std::uint8_t, 256>;
-#define XMHEADER_ENTRIES \
+#define XMHEADER_ENTRIES                    \
 	X(char17,        id_text)               \
 	X(char20,        module_name)           \
 	X(std::uint8_t,  always_1a)             \
