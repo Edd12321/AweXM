@@ -21,14 +21,12 @@ private:
 	XMINSTRUMENTPT1_ENTRIES
 #undef X
 public:
-	XMInstrumentPt1(XMInstrumentPt1 const& rhs) {
-#define X(T, name) name = rhs.name;
-		XMINSTRUMENTPT1_ENTRIES
-#undef X
-	}
+	XMInstrumentPt1& operator=(const XMInstrumentPt1&) = default;
+	XMInstrumentPt1(const XMInstrumentPt1&) = default;
+	~XMInstrumentPt1() = default;
 	friend std::istream &operator>>(std::istream&, XMInstrument&);
 	friend std::istream &operator>>(std::istream&, XMInstrumentPt1&);
-	friend std::ostream &operator<<(std::ostream&, XMInstrumentPt1 const&);	
+	friend std::ostream &operator<<(std::ostream&, const XMInstrumentPt1&);	
 };
 
 class XMInstrumentPt2 {
@@ -60,14 +58,12 @@ private:
 	XMINSTRUMENTPT2_ENTRIES
 #undef X
 public:
-	XMInstrumentPt2(XMInstrumentPt2 const& rhs) {
-#define X(T, name) name = rhs.name;
-		XMINSTRUMENTPT2_ENTRIES
-#undef X
-	}
+	XMInstrumentPt2& operator=(const XMInstrumentPt2&) = default;
+	XMInstrumentPt2(const XMInstrumentPt2&) = default;
+	~XMInstrumentPt2() = default;
 	friend std::istream &operator>>(std::istream&, XMInstrument&);
 	friend std::istream &operator>>(std::istream&, XMInstrumentPt2&);
-	friend std::ostream &operator<<(std::ostream&, XMInstrumentPt2 const&);
+	friend std::ostream &operator<<(std::ostream&, const XMInstrumentPt2&);
 };
 
 class XMInstrument {
@@ -75,6 +71,9 @@ private:
 	XMInstrumentPt1 xi1;
 	XMInstrumentPt2 xi2;
 public:
+	XMInstrument& operator=(const XMInstrument&) = default;
+	XMInstrument(const XMInstrument&) = default;
+	~XMInstrument() = default;
 	friend std::istream &operator>>(std::istream&, XMInstrument&);
 };
 

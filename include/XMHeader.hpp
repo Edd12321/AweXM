@@ -30,11 +30,9 @@ private:
 	XMHEADER_ENTRIES
 #undef X
 public:
-	XMHeader(XMHeader const& rhs) {
-#define X(T, name) name = rhs.name;
-		XMHEADER_ENTRIES
-#undef X
-	}
+	XMHeader& operator=(const XMHeader& rhs) = default;
+	XMHeader(const XMHeader &rhs) = default;
+	~XMHeader() = default;
 	friend std::istream &operator>>(std::istream&, XMHeader&);
 	friend std::ostream &operator<<(std::ostream&, const XMHeader&);
 };
