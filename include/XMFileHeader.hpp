@@ -5,12 +5,14 @@
 #include <istream>
 #include <ostream>
 
-class XMHeader {
+class XMFile;
+
+class XMFileHeader {
 private:
 	using char17  = std::array<char, 17>;
 	using char20  = std::array<char, 20>;
 	using byte256 = std::array<std::uint8_t, 256>;
-#define XMHEADER_ENTRIES                    \
+#define XMFILEHEADER_ENTRIES                \
 	X(char17,        id_text)               \
 	X(char20,        module_name)           \
 	X(std::uint8_t,  always_1a)             \
@@ -26,15 +28,17 @@ private:
 	X(std::uint16_t, default_tempo)         \
 	X(std::uint16_t, default_bpm)           \
 	X(byte256,       pattern_order_table)
-#define X(T, name) T name;
-	XMHEADER_ENTRIES
+#define X(T, name) T name{};
+	XMFILEHEADER_ENTRIES
 #undef X
 public:
-	XMHeader& operator=(const XMHeader& rhs) = default;
-	XMHeader(const XMHeader &rhs) = default;
-	~XMHeader() = default;
-	friend std::istream &operator>>(std::istream&, XMHeader&);
-	friend std::ostream &operator<<(std::ostream&, const XMHeader&);
+	XMFileHeader() = default;
+	XMFileHeader& operator=(const XMFileHeader& rhs) = default;
+	XMFileHeader(const XMFileHeader &rhs) = default;
+	~XMFileHeader() = default;
+	friend std::istream &operator>>(std::istream&, XMFileHeader&);
+	friend std::istream &operator>>(std::istream&, XMFile&);
+	friend std::ostream &operator<<(std::ostream&, const XMFileHeader&);
 };
 
 #endif // XMHEADER_HPP

@@ -4,36 +4,37 @@
 #include <cstdint>
 #include <istream>
 #include <ostream>
+#include <vector>
+#include "XMSampleHeader.hpp"
 
-class XMInstrumentPt1;
-class XMInstrumentPt2;
 class XMInstrument;
 
-class XMInstrumentPt1 {
+class XMInstrumentHeader {
 private:
 	using char22 = std::array<char, 22>;
-#define XMINSTRUMENTPT1_ENTRIES                        \
+#define XMINSTRUMENTHEADER_ENTRIES                     \
 	X(std::uint32_t,  instrument_header_size)          \
 	X(char22,         instrument_name)                 \
 	X(std::uint8_t,   instrument_type)                 \
 	X(std::uint16_t,  number_of_samples_in_instrument)
-#define X(T, name) T name;
-	XMINSTRUMENTPT1_ENTRIES
+#define X(T, name) T name{};
+	XMINSTRUMENTHEADER_ENTRIES
 #undef X
 public:
-	XMInstrumentPt1& operator=(const XMInstrumentPt1&) = default;
-	XMInstrumentPt1(const XMInstrumentPt1&) = default;
-	~XMInstrumentPt1() = default;
+	XMInstrumentHeader() = default;
+	XMInstrumentHeader& operator=(const XMInstrumentHeader&) = default;
+	XMInstrumentHeader(const XMInstrumentHeader&) = default;
+	~XMInstrumentHeader() = default;
 	friend std::istream &operator>>(std::istream&, XMInstrument&);
-	friend std::istream &operator>>(std::istream&, XMInstrumentPt1&);
-	friend std::ostream &operator<<(std::ostream&, const XMInstrumentPt1&);	
+	friend std::istream &operator>>(std::istream&, XMInstrumentHeader&);
+	friend std::ostream &operator<<(std::ostream&, const XMInstrumentHeader&);	
 };
 
-class XMInstrumentPt2 {
+class XMInstrumentExtraHeader {
 private:
 	using byte96 = std::array<std::uint8_t, 96>;
 	using byte48 = std::array<std::uint8_t, 48>;
-#define XMINSTRUMENTPT2_ENTRIES \
+#define XMINSTRUMENTEXTRAHEADER_ENTRIES \
 	X(std::uint32_t,  sample_header_size)          \
 	X(byte96,         sample_number_for_all_notes) \
 	X(byte48,         points_for_volume_envelope)  \
@@ -54,23 +55,27 @@ private:
 	X(std::uint8_t,   vibrato_rate)                \
 	X(std::uint16_t,  volume_fadeout)              \
 	X(std::uint16_t,  reserved)
-#define X(T, name) T name;
-	XMINSTRUMENTPT2_ENTRIES
+#define X(T, name) T name{};
+	XMINSTRUMENTEXTRAHEADER_ENTRIES
 #undef X
 public:
-	XMInstrumentPt2& operator=(const XMInstrumentPt2&) = default;
-	XMInstrumentPt2(const XMInstrumentPt2&) = default;
-	~XMInstrumentPt2() = default;
+	XMInstrumentExtraHeader() = default;
+	XMInstrumentExtraHeader& operator=(const XMInstrumentExtraHeader&) = default;
+	XMInstrumentExtraHeader(const XMInstrumentExtraHeader&) = default;
+	~XMInstrumentExtraHeader() = default;
 	friend std::istream &operator>>(std::istream&, XMInstrument&);
-	friend std::istream &operator>>(std::istream&, XMInstrumentPt2&);
-	friend std::ostream &operator<<(std::ostream&, const XMInstrumentPt2&);
+	friend std::istream &operator>>(std::istream&, XMInstrumentExtraHeader&);
+	friend std::ostream &operator<<(std::ostream&, const XMInstrumentExtraHeader&);
 };
 
 class XMInstrument {
 private:
-	XMInstrumentPt1 xi1;
-	XMInstrumentPt2 xi2;
+	XMInstrumentHeader xih;
+	XMInstrumentExtraHeader xieh;
+	std::vector<XMSampleHeader> v_xsh;
+	std::vector<std::vector<std::uint8_t>> v_xsd;
 public:
+	XMInstrument() = default;
 	XMInstrument& operator=(const XMInstrument&) = default;
 	XMInstrument(const XMInstrument&) = default;
 	~XMInstrument() = default;

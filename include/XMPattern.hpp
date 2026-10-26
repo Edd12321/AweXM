@@ -5,7 +5,6 @@
 #include <ostream>
 #include <vector>
 
-class XMPatternPt1;
 class XMPattern;
 
 class XMPatternPt1 {
@@ -15,10 +14,11 @@ private:
 	X(std::uint8_t,  packing_type)              \
 	X(std::uint16_t, number_of_rows_in_pattern) \
 	X(std::uint16_t, packed_patterndata_size)
-#define X(T, name) T name;
+#define X(T, name) T name{};
 	XMPATTERNPT1_ENTRIES
 #undef X
 public:	
+	XMPatternPt1() = default;
 	XMPatternPt1& operator=(const XMPatternPt1&) = default;
 	XMPatternPt1(const XMPatternPt1&) = default;
 	~XMPatternPt1() = default;
@@ -32,6 +32,7 @@ private:
 	XMPatternPt1 xp1;
 	std::vector<std::uint8_t> patterndata;
 public:
+	XMPattern() = default;
 	XMPattern& operator=(const XMPattern& rhs) = default;
 	XMPattern(const XMPattern &rhs) = default;
 	~XMPattern() = default;

@@ -1,5 +1,3 @@
-#include <istream>
-#include <ostream>
 #include "util.hpp"
 #include "XMPattern.hpp"
 

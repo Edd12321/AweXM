@@ -1,25 +1,31 @@
-#include <istream>
-#include <ostream>
 #include "util.hpp"
 #include "XMInstrument.hpp"
 
-std::istream &operator>>(std::istream &in, XMInstrumentPt1 &xi1) {
-#define X(T, name) binread(in, xi1.name);
-	XMINSTRUMENTPT1_ENTRIES
+std::istream &operator>>(std::istream &in, XMInstrumentHeader &xih) {
+#define X(T, name) binread(in, xih.name);
+	XMINSTRUMENTHEADER_ENTRIES
 #undef X
 	return in;
 }
 
-std::istream &operator>>(std::istream &in, XMInstrumentPt2 &xi2) {
-#define X(T, name) binread(in, xi2.name);
-	XMINSTRUMENTPT2_ENTRIES
+std::istream &operator>>(std::istream &in, XMInstrumentExtraHeader &xieh) {
+#define X(T, name) binread(in, xieh.name);
+	XMINSTRUMENTEXTRAHEADER_ENTRIES
 #undef X
 	return in;
 }
 
 std::istream &operator>>(std::istream &in, XMInstrument &xi) {
-	in >> xi.xi1;
-	if (xi.xi1.number_of_samples_in_instrument)
-		in >> xi.xi2;
+	in >> xi.xih;
+	auto ns = xi.xih.number_of_samples_in_instrument;
+	if (ns > 0) {
+		in >> xi.xieh;
+		xi.v_xsh.resize(ns);
+		xi.v_xsd.resize(ns);
+		for (auto &i : xi.v_xsh)
+			in >> i;
+		for (auto &i : xi.v_xsd)
+			binread(in, i);
+	}
 	return in;
 }
