@@ -1,14 +1,16 @@
-#ifndef XMSAMPLEHEADER_HPP
-#define XMSAMPLEHEADER_HPP
+#ifndef AWEXM_SAMPLEHEADER_HPP
+#define AWEXM_SAMPLEHEADER_HPP
 #include <array>
 #include <cstdint>
 #include <istream>
 #include <ostream>
 
-class XMSampleHeader {
+namespace AweXM {
+
+class SampleHeader {
 private:
 	using char20 = std::array<char, 20>;
-#define XMSAMPLEHEADER_ENTRIES             \
+#define AWEXM_SAMPLEHEADER_ENTRIES         \
 	X(std::uint32_t, sample_length)        \
 	X(std::uint32_t, sample_loop_start)    \
 	X(std::uint32_t, sample_loop_length)   \
@@ -20,16 +22,18 @@ private:
 	X(std::uint8_t,  reserved)             \
 	X(char20,        sample_name)
 #define X(T, name) T name;
-	XMSAMPLEHEADER_ENTRIES
+	AWEXM_SAMPLEHEADER_ENTRIES
 #undef X
 public:
-	XMSampleHeader() = default;
-	XMSampleHeader& operator=(const XMSampleHeader&) = default;
-	XMSampleHeader(const XMSampleHeader&) = default;
-	~XMSampleHeader() = default;
-	friend std::istream &operator>>(std::istream&, XMSampleHeader&);
-	friend std::istream &operator>>(std::istream&, XMSampleHeader&);
-	friend std::ostream &operator<<(std::ostream&, const XMSampleHeader&);
+	SampleHeader() = default;
+	SampleHeader& operator=(const SampleHeader&) = default;
+	SampleHeader(const SampleHeader&) = default;
+	~SampleHeader() = default;
+	friend std::istream &operator>>(std::istream&, SampleHeader&);
+	friend std::istream &operator>>(std::istream&, SampleHeader&);
+	friend std::ostream &operator<<(std::ostream&, const SampleHeader&);
 };
 
-#endif // XMSAMPLEHEADER_HPP
+}
+
+#endif // AWEXM_SAMPLEHEADER_HPP

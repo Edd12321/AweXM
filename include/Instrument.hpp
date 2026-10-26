@@ -1,40 +1,42 @@
-#ifndef XMINSTRUMENT_HPP
-#define XMINSTRUMENT_HPP
+#ifndef AWEXM_INSTRUMENT_HPP
+#define AWEXM_INSTRUMENT_HPP
 #include <array>
 #include <cstdint>
 #include <istream>
 #include <ostream>
 #include <vector>
-#include "XMSampleHeader.hpp"
+#include "SampleHeader.hpp"
 
-class XMInstrument;
+namespace AweXM {
 
-class XMInstrumentHeader {
+class Instrument;
+
+class InstrumentHeader {
 private:
 	using char22 = std::array<char, 22>;
-#define XMINSTRUMENTHEADER_ENTRIES                     \
+#define AWEXM_INSTRUMENTHEADER_ENTRIES                 \
 	X(std::uint32_t,  instrument_header_size)          \
 	X(char22,         instrument_name)                 \
 	X(std::uint8_t,   instrument_type)                 \
 	X(std::uint16_t,  number_of_samples_in_instrument)
 #define X(T, name) T name{};
-	XMINSTRUMENTHEADER_ENTRIES
+	AWEXM_INSTRUMENTHEADER_ENTRIES
 #undef X
 public:
-	XMInstrumentHeader() = default;
-	XMInstrumentHeader& operator=(const XMInstrumentHeader&) = default;
-	XMInstrumentHeader(const XMInstrumentHeader&) = default;
-	~XMInstrumentHeader() = default;
-	friend std::istream &operator>>(std::istream&, XMInstrument&);
-	friend std::istream &operator>>(std::istream&, XMInstrumentHeader&);
-	friend std::ostream &operator<<(std::ostream&, const XMInstrumentHeader&);	
+	InstrumentHeader() = default;
+	InstrumentHeader& operator=(const InstrumentHeader&) = default;
+	InstrumentHeader(const InstrumentHeader&) = default;
+	~InstrumentHeader() = default;
+	friend std::istream &operator>>(std::istream&, Instrument&);
+	friend std::istream &operator>>(std::istream&, InstrumentHeader&);
+	friend std::ostream &operator<<(std::ostream&, const InstrumentHeader&);	
 };
 
-class XMInstrumentExtraHeader {
+class InstrumentExtraHeader {
 private:
 	using byte96 = std::array<std::uint8_t, 96>;
 	using byte48 = std::array<std::uint8_t, 48>;
-#define XMINSTRUMENTEXTRAHEADER_ENTRIES \
+#define AWEXM_INSTRUMENTEXTRAHEADER_ENTRIES        \
 	X(std::uint32_t,  sample_header_size)          \
 	X(byte96,         sample_number_for_all_notes) \
 	X(byte48,         points_for_volume_envelope)  \
@@ -56,30 +58,32 @@ private:
 	X(std::uint16_t,  volume_fadeout)              \
 	X(std::uint16_t,  reserved)
 #define X(T, name) T name{};
-	XMINSTRUMENTEXTRAHEADER_ENTRIES
+	AWEXM_INSTRUMENTEXTRAHEADER_ENTRIES
 #undef X
 public:
-	XMInstrumentExtraHeader() = default;
-	XMInstrumentExtraHeader& operator=(const XMInstrumentExtraHeader&) = default;
-	XMInstrumentExtraHeader(const XMInstrumentExtraHeader&) = default;
-	~XMInstrumentExtraHeader() = default;
-	friend std::istream &operator>>(std::istream&, XMInstrument&);
-	friend std::istream &operator>>(std::istream&, XMInstrumentExtraHeader&);
-	friend std::ostream &operator<<(std::ostream&, const XMInstrumentExtraHeader&);
+	InstrumentExtraHeader() = default;
+	InstrumentExtraHeader& operator=(const InstrumentExtraHeader&) = default;
+	InstrumentExtraHeader(const InstrumentExtraHeader&) = default;
+	~InstrumentExtraHeader() = default;
+	friend std::istream &operator>>(std::istream&, Instrument&);
+	friend std::istream &operator>>(std::istream&, InstrumentExtraHeader&);
+	friend std::ostream &operator<<(std::ostream&, const InstrumentExtraHeader&);
 };
 
-class XMInstrument {
+class Instrument {
 private:
-	XMInstrumentHeader xih;
-	XMInstrumentExtraHeader xieh;
-	std::vector<XMSampleHeader> v_xsh;
+	InstrumentHeader xih;
+	InstrumentExtraHeader xieh;
+	std::vector<SampleHeader> v_xsh;
 	std::vector<std::vector<std::uint8_t>> v_xsd;
 public:
-	XMInstrument() = default;
-	XMInstrument& operator=(const XMInstrument&) = default;
-	XMInstrument(const XMInstrument&) = default;
-	~XMInstrument() = default;
-	friend std::istream &operator>>(std::istream&, XMInstrument&);
+	Instrument() = default;
+	Instrument& operator=(const Instrument&) = default;
+	Instrument(const Instrument&) = default;
+	~Instrument() = default;
+	friend std::istream &operator>>(std::istream&, Instrument&);
 };
 
-#endif // XMINSTRUMENT_HPP
+}
+
+#endif // AWEXM_INSTRUMENT_HPP

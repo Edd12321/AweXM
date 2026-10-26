@@ -1,21 +1,23 @@
+#include "Instrument.hpp"
 #include "util.hpp"
-#include "XMInstrument.hpp"
 
-std::istream &operator>>(std::istream &in, XMInstrumentHeader &xih) {
+namespace AweXM {
+
+std::istream &operator>>(std::istream &in, InstrumentHeader &xih) {
 #define X(T, name) binread(in, xih.name);
-	XMINSTRUMENTHEADER_ENTRIES
+	AWEXM_INSTRUMENTHEADER_ENTRIES
 #undef X
 	return in;
 }
 
-std::istream &operator>>(std::istream &in, XMInstrumentExtraHeader &xieh) {
+std::istream &operator>>(std::istream &in, InstrumentExtraHeader &xieh) {
 #define X(T, name) binread(in, xieh.name);
-	XMINSTRUMENTEXTRAHEADER_ENTRIES
+	AWEXM_INSTRUMENTEXTRAHEADER_ENTRIES
 #undef X
 	return in;
 }
 
-std::istream &operator>>(std::istream &in, XMInstrument &xi) {
+std::istream &operator>>(std::istream &in, Instrument &xi) {
 	in >> xi.xih;
 	auto ns = xi.xih.number_of_samples_in_instrument;
 	if (ns > 0) {
@@ -28,4 +30,6 @@ std::istream &operator>>(std::istream &in, XMInstrument &xi) {
 			binread(in, i);
 	}
 	return in;
+}
+
 }
