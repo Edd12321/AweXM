@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 # NOTE: update EXECUTABLE_NAME in .github/workflows/cmake.yml when changing executable name in this file
 # for now, the project name is used as the executable name
-set(MAIN_PROJECT_NAME "oop")
+set(MAIN_PROJECT_NAME "awexm")
 set(MAIN_EXECUTABLE_NAME "${MAIN_PROJECT_NAME}_main")
 set(MAIN_LIBRARY_NAME "${MAIN_PROJECT_NAME}")
 set(TESTS_EXECUTABLE_NAME "${MAIN_PROJECT_NAME}_test")
@@ -69,8 +69,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
 )
 target_sources(${MAIN_LIBRARY_NAME}
     PRIVATE
-        src/Example.cpp
-        src/internal/Detail.cpp
+		src/File.cpp
+		src/Instrument.cpp
+		src/Pattern.cpp
+		src/SampleHeader.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
