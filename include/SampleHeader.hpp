@@ -7,6 +7,8 @@
 
 namespace AweXM {
 
+class Instrument;
+
 class SampleHeader {
 private:
 	using char20 = std::array<char, 20>;
@@ -21,7 +23,7 @@ private:
 	X(std::int8_t,   relative_note_number) \
 	X(std::uint8_t,  reserved)             \
 	X(char20,        sample_name)
-#define X(T, name) T name;
+#define X(T, name) T name{};
 	AWEXM_SAMPLEHEADER_ENTRIES
 #undef X
 public:
@@ -29,7 +31,7 @@ public:
 	SampleHeader& operator=(const SampleHeader&) = default;
 	SampleHeader(const SampleHeader&) = default;
 	~SampleHeader() = default;
-	friend std::istream &operator>>(std::istream&, SampleHeader&);
+	friend std::istream &operator>>(std::istream&, Instrument&);
 	friend std::istream &operator>>(std::istream&, SampleHeader&);
 	friend std::ostream &operator<<(std::ostream&, const SampleHeader&);
 };

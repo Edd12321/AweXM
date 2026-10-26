@@ -26,8 +26,10 @@ std::istream &operator>>(std::istream &in, Instrument &xi) {
 		xi.v_xsd.resize(ns);
 		for (auto &i : xi.v_xsh)
 			in >> i;
-		for (auto &i : xi.v_xsd)
-			binread(in, i);
+		for (std::size_t i = 0; i < ns; ++i) {
+			xi.v_xsd[i].resize(xi.v_xsh[i].sample_length);
+			binread(in, xi.v_xsd[i]);
+		}
 	}
 	return in;
 }

@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <istream>
 #include <ostream>
+#include <string>
+#include <vector>
 #include "Pattern.hpp"
 #include "Instrument.hpp"
 

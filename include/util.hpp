@@ -3,8 +3,10 @@
 #include <array>
 #include <cstddef>
 #include <istream>
-#include <vector>
+#include <string>
+#include <stdexcept>
 #include <type_traits>
+#include <vector>
 
 template<typename T>
 struct has_data {
@@ -27,6 +29,8 @@ void binread(std::istream &in, T &dst, std::streamsize len = sizeof(T)) {
 }
 template<typename T, typename = typename std::enable_if<has_data<T>::value>::type>
 void binread(std::istream &in, T &dst) {
+	if (dst.empty())
+		return;
 	binread(in, *dst.data(), dst.size() * sizeof(typename T::value_type));
 }
 
