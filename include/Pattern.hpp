@@ -20,10 +20,6 @@ private:
 	AWEXM_PATTERNPT1_ENTRIES
 #undef X
 public:	
-	PatternPt1() = default;
-	PatternPt1& operator=(const PatternPt1&) = default;
-	PatternPt1(const PatternPt1&) = default;
-	~PatternPt1() = default;
 	friend std::istream &operator>>(std::istream&, Pattern&);
 	friend std::istream &operator>>(std::istream&, PatternPt1&);
 	friend std::ostream &operator<<(std::ostream&, const PatternPt1&);
@@ -34,10 +30,6 @@ private:
 	PatternPt1 xp1;
 	std::vector<std::uint8_t> patterndata;
 public:
-	Pattern() = default;
-	Pattern& operator=(const Pattern& rhs) = default;
-	Pattern(const Pattern &rhs) = default;
-	~Pattern() = default;
 	friend std::istream &operator>>(std::istream&, Pattern&);
 	friend std::ostream &operator<<(std::ostream&, const Pattern&);
 };

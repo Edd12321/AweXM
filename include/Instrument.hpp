@@ -23,10 +23,6 @@ private:
 	AWEXM_INSTRUMENTHEADER_ENTRIES
 #undef X
 public:
-	InstrumentHeader() = default;
-	InstrumentHeader& operator=(const InstrumentHeader&) = default;
-	InstrumentHeader(const InstrumentHeader&) = default;
-	~InstrumentHeader() = default;
 	friend std::istream &operator>>(std::istream&, Instrument&);
 	friend std::istream &operator>>(std::istream&, InstrumentHeader&);
 	friend std::ostream &operator<<(std::ostream&, const InstrumentHeader&);	

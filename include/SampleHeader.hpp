@@ -27,10 +27,6 @@ private:
 	AWEXM_SAMPLEHEADER_ENTRIES
 #undef X
 public:
-	SampleHeader() = default;
-	SampleHeader& operator=(const SampleHeader&) = default;
-	SampleHeader(const SampleHeader&) = default;
-	~SampleHeader() = default;
 	friend std::istream &operator>>(std::istream&, Instrument&);
 	friend std::istream &operator>>(std::istream&, SampleHeader&);
 	friend std::ostream &operator<<(std::ostream&, const SampleHeader&);

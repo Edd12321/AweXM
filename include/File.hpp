@@ -38,10 +38,6 @@ private:
 	AWEXM_FILEHEADER_ENTRIES
 #undef X
 public:
-	FileHeader() = default;
-	FileHeader& operator=(const FileHeader& rhs) = default;
-	FileHeader(const FileHeader &rhs) = default;
-	~FileHeader() = default;
 	friend std::istream &operator>>(std::istream&, FileHeader&);
 	friend std::istream &operator>>(std::istream&, File&);
 	friend std::ostream &operator<<(std::ostream&, const FileHeader&);
@@ -53,11 +49,13 @@ private:
 	std::vector<Pattern> v_xp;
 	std::vector<Instrument> v_xi;
 public:
-	explicit File(std::string const&);
-	File() = delete;
-	File& operator=(const File&) = default;
-	File(const File&) = default;
-	~File() = default;
+	explicit File(const std::string&);
+	File() = default;
+	File &operator=(const File&);
+	File(const File&);
+	File &operator=(File&&) noexcept;
+	File(File&&) noexcept;
+	~File();
 	friend std::istream &operator>>(std::istream&, File&);
 	friend std::ostream &operator<<(std::ostream&, const File&);
 };

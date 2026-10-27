@@ -1,5 +1,6 @@
 #include <fstream>
 #include <stdexcept>
+#include <utility>
 #include "File.hpp"
 #include "util.hpp"
 
@@ -28,6 +29,38 @@ File::File(std::string const& filename) {
 	if (!fin)
 		throw std::runtime_error("could not open file " + filename);
 	fin >> *this;
+}
+
+File &File::operator=(const File &rhs) {
+	if (this != &rhs) {
+		xh = rhs.xh;
+		v_xp = rhs.v_xp;
+		v_xi = rhs.v_xi;
+	}
+	return *this;
+}
+
+File::File(const File &rhs) {
+	*this = rhs;
+}
+
+
+File &File::operator=(File &&rhs) noexcept {
+	if (this != &rhs) {
+		xh = rhs.xh;
+		v_xp = std::move(rhs.v_xp);
+		v_xi = std::move(rhs.v_xi);
+	}
+	return *this;
+}
+
+File::File(File &&rhs) noexcept {
+	*this = std::move(rhs);
+}
+
+File::~File() {
+	volatile char c;
+	(void)(c = 0); // trebuia sa faca ceva
 }
 
 }
