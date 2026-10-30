@@ -9,5 +9,11 @@ std::istream &operator>>(std::istream &in, SampleHeader &xsh) {
 #undef X
 	return in;
 }
+std::ostream &operator<<(std::ostream &out, const SampleHeader &xsh) {
+#define X(T, name) binwrite(out, xsh.name);
+	AWEXM_SAMPLEHEADER_ENTRIES
+#undef X
+	return out;
+}
 
 }

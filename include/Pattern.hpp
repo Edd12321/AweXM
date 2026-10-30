@@ -12,10 +12,10 @@ class Pattern;
 class PatternPt1 {
 private:
 #define AWEXM_PATTERNPT1_ENTRIES                \
-	X(std::uint32_t, pattern_header_length)     \
-	X(std::uint8_t,  packing_type)              \
-	X(std::uint16_t, number_of_rows_in_pattern) \
-	X(std::uint16_t, packed_patterndata_size)
+    X(std::uint32_t, pattern_header_length)     \
+    X(std::uint8_t,  packing_type)              \
+    X(std::uint16_t, number_of_rows_in_pattern) \
+    X(std::uint16_t, packed_patterndata_size)
 #define X(T, name) T name{};
 	AWEXM_PATTERNPT1_ENTRIES
 #undef X

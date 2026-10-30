@@ -6,14 +6,20 @@
 
 namespace AweXM {
 
-std::istream &operator>>(std::istream& in, FileHeader &xfh) {
+std::istream &operator>>(std::istream &in, FileHeader &xfh) {
 #define X(T, name) binread(in, xfh.name);
 	AWEXM_FILEHEADER_ENTRIES
 #undef X
 	return in;
 }
+std::ostream &operator<<(std::ostream &out, const FileHeader &xfh) {
+#define X(T, name) binwrite(out, xfh.name);
+	AWEXM_FILEHEADER_ENTRIES
+#undef X
+	return out;
+}
 
-std::istream &operator>>(std::istream& in, File &xf) {
+std::istream &operator>>(std::istream &in, File &xf) {
 	in >> xf.xh;
 	xf.v_xp.resize(xf.xh.number_of_patterns);
 	for (auto& i : xf.v_xp)
@@ -22,6 +28,12 @@ std::istream &operator>>(std::istream& in, File &xf) {
 	for (auto& i : xf.v_xi)
 		in >> i;
 	return in;
+}
+std::ostream &operator<<(std::ostream &out, const File &xf) {
+	out << xf.xh;
+	binwrite(out, xf.v_xp);
+	binwrite(out, xf.v_xi);
+	return out;
 }
 
 File::File(std::string const& filename) {

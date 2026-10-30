@@ -21,17 +21,24 @@ struct has_data<std::array<T, n>> {
 	static constexpr bool value = true;
 };
 
-template<typename T, typename = typename std::enable_if<!has_data<T>::value>::type>
-void binread(std::istream &in, T &dst, std::streamsize len = sizeof(T)) {
-	in.read(reinterpret_cast<char*>(&dst), len);
-	if (in.gcount() != len)
+#define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, extra)                               \
+template<typename T, typename = typename std::enable_if<!has_data<T>::value>::type> \
+void bin##oper(std::stream &s, T &dst, std::streamsize len = sizeof(T)) {           \
+    s.oper(reinterpret_cast<C>(&dst), len);                                         \
+    extra;                                                                          \
+}                                                                                   \
+                                                                                    \
+template<typename T, typename = typename std::enable_if<has_data<T>::value>::type>  \
+void bin##oper(std::stream &s, T &dst) {                                            \
+    if (dst.empty())                                                                \
+        return;                                                                     \
+    bin##oper(s, *dst.data(), dst.size() * sizeof(typename T::value_type));         \
+}
+
+AWEXM_DRY_AVOIDER_DEF(write, ostream, const char*,)
+AWEXM_DRY_AVOIDER_DEF(read,  istream, char*,
+	if (s.gcount() != len)
 		throw std::runtime_error("couldn't read " + std::to_string(len) + " bytes");
-}
-template<typename T, typename = typename std::enable_if<has_data<T>::value>::type>
-void binread(std::istream &in, T &dst) {
-	if (dst.empty())
-		return;
-	binread(in, *dst.data(), dst.size() * sizeof(typename T::value_type));
-}
+)
 
 #endif // UTIL_HPP

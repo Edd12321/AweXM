@@ -19,21 +19,21 @@ private:
 	using char20  = std::array<char, 20>;
 	using byte256 = std::array<std::uint8_t, 256>;
 #define AWEXM_FILEHEADER_ENTRIES            \
-	X(char17,        id_text)               \
-	X(char20,        module_name)           \
-	X(std::uint8_t,  always_1a)             \
-	X(char20,        tracker_name)          \
-	X(std::uint16_t, version_number)        \
-	X(std::uint32_t, header_size)           \
-	X(std::uint16_t, song_length)           \
-	X(std::uint16_t, song_restart_position) \
-	X(std::uint16_t, number_of_channels)    \
-	X(std::uint16_t, number_of_patterns)    \
-	X(std::uint16_t, number_of_instruments) \
-	X(std::uint16_t, flags_field)           \
-	X(std::uint16_t, default_tempo)         \
-	X(std::uint16_t, default_bpm)           \
-	X(byte256,       pattern_order_table)
+    X(char17,        id_text)               \
+    X(char20,        module_name)           \
+    X(std::uint8_t,  always_1a)             \
+    X(char20,        tracker_name)          \
+    X(std::uint16_t, version_number)        \
+    X(std::uint32_t, header_size)           \
+    X(std::uint16_t, song_length)           \
+    X(std::uint16_t, song_restart_position) \
+    X(std::uint16_t, number_of_channels)    \
+    X(std::uint16_t, number_of_patterns)    \
+    X(std::uint16_t, number_of_instruments) \
+    X(std::uint16_t, flags_field)           \
+    X(std::uint16_t, default_tempo)         \
+    X(std::uint16_t, default_bpm)           \
+    X(byte256,       pattern_order_table)
 #define X(T, name) T name{};
 	AWEXM_FILEHEADER_ENTRIES
 #undef X

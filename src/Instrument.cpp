@@ -1,5 +1,6 @@
 #include "Instrument.hpp"
 #include "util.hpp"
+#include <iostream>
 
 namespace AweXM {
 
@@ -9,12 +10,24 @@ std::istream &operator>>(std::istream &in, InstrumentHeader &xih) {
 #undef X
 	return in;
 }
+std::ostream &operator<<(std::ostream &out, const InstrumentHeader &xih) {
+#define X(T, name) binwrite(out, xih.name);
+	AWEXM_INSTRUMENTHEADER_ENTRIES
+#undef X
+	return out;
+}
 
 std::istream &operator>>(std::istream &in, InstrumentExtraHeader &xieh) {
 #define X(T, name) binread(in, xieh.name);
 	AWEXM_INSTRUMENTEXTRAHEADER_ENTRIES
 #undef X
 	return in;
+}
+std::ostream &operator<<(std::ostream &out, const InstrumentExtraHeader &xieh) {
+#define X(T, name) binwrite(out, xieh.name);
+	AWEXM_INSTRUMENTEXTRAHEADER_ENTRIES
+#undef X
+	return out;
 }
 
 std::istream &operator>>(std::istream &in, Instrument &xi) {
@@ -32,6 +45,14 @@ std::istream &operator>>(std::istream &in, Instrument &xi) {
 		}
 	}
 	return in;
+}
+std::ostream &operator<<(std::ostream &out, const Instrument &xi) {
+	out << xi.xih;
+	for (const auto &i : xi.v_xsh)
+		out << i;
+	for (const auto &i : xi.v_xsd)
+		binwrite(out, i);
+	return out;
 }
 
 }
