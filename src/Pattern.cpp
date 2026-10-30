@@ -3,29 +3,21 @@
 
 namespace AweXM {
 
-std::istream &operator>>(std::istream &in, PatternPt1 &xpp1) {
-#define X(T, data) in >> xpp1.data;
-	AWEXM_PATTERNPT1_ENTRIES
-#undef X
-	return in;
-}
-std::ostream &operator<<(std::ostream &out, const PatternPt1 &xpp1) {
-#define X(T, data) out << xpp1.data;
-	AWEXM_PATTERNPT1_ENTRIES
-#undef X
-	return out;
-}
-
 std::istream &operator>>(std::istream &in, Pattern &xp) {
-	in >> xp.xp1;
-	if (xp.xp1.packed_patterndata_size) {
-		xp.patterndata.resize(xp.xp1.packed_patterndata_size);
+#define X(T, name) binread(in, xp.name);
+	AWEXM_PATTERN_ENTRIES1
+#undef X
+	auto ps = xp.packed_patterndata_size;
+	if (ps) {
+		xp.patterndata.resize(ps);
 		binread(in, xp.patterndata);
 	}
 	return in;
 }
 std::ostream &operator<<(std::ostream &out, const Pattern &xp) {
-	out << xp.xp1;
+#define X(T, name) binwrite(out, xp.name);
+	AWEXM_PATTERN_ENTRIES1
+#undef X
 	binwrite(out, xp.patterndata);
 	return out;
 }

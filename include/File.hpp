@@ -1,6 +1,5 @@
 #ifndef AWEXM_FILEHEADER_HPP
 #define AWEXM_FILEHEADER_HPP
-#include <array>
 #include <cstdint>
 #include <istream>
 #include <ostream>
@@ -8,6 +7,7 @@
 #include <vector>
 #include "Pattern.hpp"
 #include "Instrument.hpp"
+#include "util.hpp"
 
 namespace AweXM {
 
@@ -15,14 +15,11 @@ class File;
 
 class FileHeader {
 private:
-	using char17  = std::array<char, 17>;
-	using char20  = std::array<char, 20>;
-	using byte256 = std::array<std::uint8_t, 256>;
 #define AWEXM_FILEHEADER_ENTRIES            \
-    X(char17,        id_text)               \
-    X(char20,        module_name)           \
+    X(buffer<17>,    id_text)               \
+    X(buffer<20>,    module_name)           \
     X(std::uint8_t,  always_1a)             \
-    X(char20,        tracker_name)          \
+    X(buffer<20>,    tracker_name)          \
     X(std::uint16_t, version_number)        \
     X(std::uint32_t, header_size)           \
     X(std::uint16_t, song_length)           \
@@ -32,12 +29,16 @@ private:
     X(std::uint16_t, number_of_instruments) \
     X(std::uint16_t, flags_field)           \
     X(std::uint16_t, default_tempo)         \
-    X(std::uint16_t, default_bpm)           \
-    X(byte256,       pattern_order_table)
+    X(std::uint16_t, default_bpm)
 #define X(T, name) T name{};
 	AWEXM_FILEHEADER_ENTRIES
 #undef X
+	std::vector<std::uint8_t> pattern_order_table;
 public:
+#define X(T, name) const T &get_##name() const noexcept;
+	AWEXM_FILEHEADER_ENTRIES
+#undef X
+
 	friend std::istream &operator>>(std::istream&, FileHeader&);
 	friend std::istream &operator>>(std::istream&, File&);
 	friend std::ostream &operator<<(std::ostream&, const FileHeader&);
@@ -56,6 +57,11 @@ public:
 	File &operator=(File&&) noexcept;
 	File(File&&) noexcept;
 	~File();
+
+	[[nodiscard]] const FileHeader &get_file_header() const noexcept;
+	[[nodiscard]] const std::vector<Pattern> &get_patterns() const noexcept;
+	[[nodiscard]] const std::vector<Instrument> &get_instruments() const noexcept;
+
 	friend std::istream &operator>>(std::istream&, File&);
 	friend std::ostream &operator<<(std::ostream&, const File&);
 };

@@ -6,16 +6,42 @@
 
 namespace AweXM {
 
+// voi decomenta pe masura ce le folosesc
+// cppcheck se plange
+/*
+#define X(T, name)                                 \
+const T &FileHeader::get_##name() const noexcept { \
+    return name;                                   \
+}
+AWEXM_FILEHEADER_ENTRIES
+#undef X
+const FileHeader &File::get_file_header() const noexcept {
+	return xh;
+}
+const std::vector<Pattern> &File::get_patterns() const noexcept {
+	return v_xp;
+}
+const std::vector<Instrument> &File::get_instruments() const noexcept {
+	return v_xi;
+}
+*/
+
 std::istream &operator>>(std::istream &in, FileHeader &xfh) {
 #define X(T, name) binread(in, xfh.name);
 	AWEXM_FILEHEADER_ENTRIES
 #undef X
+	auto np = xfh.number_of_patterns;
+	if (np) {
+		xfh.pattern_order_table.resize(np);
+		binread(in, xfh.pattern_order_table);
+	}
 	return in;
 }
 std::ostream &operator<<(std::ostream &out, const FileHeader &xfh) {
 #define X(T, name) binwrite(out, xfh.name);
 	AWEXM_FILEHEADER_ENTRIES
 #undef X
+	binwrite(out, xfh.pattern_order_table);
 	return out;
 }
 
@@ -31,12 +57,12 @@ std::istream &operator>>(std::istream &in, File &xf) {
 }
 std::ostream &operator<<(std::ostream &out, const File &xf) {
 	out << xf.xh;
-	binwrite(out, xf.v_xp);
-	binwrite(out, xf.v_xi);
+	for (const auto &it : xf.v_xp) out << it;
+	for (const auto &it : xf.v_xi) out << it;
 	return out;
 }
 
-File::File(std::string const& filename) {
+File::File(const std::string &filename) {
 	std::ifstream fin(filename, std::ios_base::binary);
 	if (!fin)
 		throw std::runtime_error("could not open file " + filename);

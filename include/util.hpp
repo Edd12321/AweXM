@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef AWEXM_UTIL_HPP
+#define AWEXM_UTIL_HPP
 #include <array>
 #include <cstddef>
 #include <istream>
@@ -7,6 +7,11 @@
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
+
+namespace AweXM {
+
+template<std::size_t n>
+using buffer = std::array<std::uint8_t, n>;
 
 template<typename T>
 struct has_data {
@@ -41,4 +46,6 @@ AWEXM_DRY_AVOIDER_DEF(read,  istream, char*,
 		throw std::runtime_error("couldn't read " + std::to_string(len) + " bytes");
 )
 
-#endif // UTIL_HPP
+}
+
+#endif // AWEXM_UTIL_HPP

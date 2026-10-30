@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include "File.hpp"
 
 int main(int argc, char **argv) {
@@ -8,6 +8,5 @@ int main(int argc, char **argv) {
 		return EXIT_SUCCESS; // EXIT_FAILURE;
 	}
 	AweXM::File f(argv[1]);
-	std::cout << f;
 	return EXIT_SUCCESS;
 }

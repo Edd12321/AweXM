@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <istream>
 #include <ostream>
+#include "util.hpp"
 
 namespace AweXM {
 
@@ -11,7 +12,6 @@ class Instrument;
 
 class SampleHeader {
 private:
-	using char20 = std::array<char, 20>;
 #define AWEXM_SAMPLEHEADER_ENTRIES         \
     X(std::uint32_t, sample_length)        \
     X(std::uint32_t, sample_loop_start)    \
@@ -22,7 +22,7 @@ private:
     X(std::uint8_t,  panning)              \
     X(std::int8_t,   relative_note_number) \
     X(std::uint8_t,  reserved)             \
-    X(char20,        sample_name)
+    X(buffer<22>,    sample_name)
 #define X(T, name) T name{};
 	AWEXM_SAMPLEHEADER_ENTRIES
 #undef X
