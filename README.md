@@ -1,5 +1,9 @@
 # AweXM
-AweXM is (soon to be) a tracker for the XM (eXtended Module) sample-based music format, written for my uni's OOP course. The spec for XM is described in this [document](https://github.com/milkytracker/MilkyTracker/blob/master/resources/reference/xm-form.txt).
+AweXM is (soon to be) a tracker for the XM (eXtended Module) sample-based music format, written for my uni's OOP course. The structure of the program is different from what I usually write (e. g. it has CMake, AGENTS.md, GitHub Actions, AGPL license) because it uses a template.
+
+Documentation I used:
+ - https://github.com/milkytracker/MilkyTracker/blob/master/resources/reference/xm-form.txt (contains some errors);
+ - https://www.celersms.com/doc/XM_file_format.pdf.
 
 Below is the rest of the original template's README, in Romanian.
 

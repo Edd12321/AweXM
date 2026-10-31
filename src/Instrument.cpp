@@ -9,6 +9,9 @@ std::istream &operator>>(std::istream &in, InstrumentHeader &xih) {
 	AWEXM_INSTRUMENTHEADER_ENTRIES1
 	if (xih.number_of_samples_in_instrument) {
 		AWEXM_INSTRUMENTHEADER_ENTRIES2
+	} else if (xih.instrument_header_size > 29) {
+		xih.garbage.resize(xih.instrument_header_size - 29);
+		binread(in, xih.garbage);
 	}
 #undef X
 	return in;
@@ -18,7 +21,8 @@ std::ostream &operator<<(std::ostream &out, const InstrumentHeader &xih) {
 	AWEXM_INSTRUMENTHEADER_ENTRIES1
 	if (xih.number_of_samples_in_instrument) {
 		AWEXM_INSTRUMENTHEADER_ENTRIES2
-	}
+	} else if (xih.instrument_header_size > 29)
+		binwrite(out, xih.garbage);
 #undef X
 	return out;
 }

@@ -26,11 +26,12 @@ struct has_data<std::array<T, n>> {
 	static constexpr bool value = true;
 };
 
-#define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, extra)                               \
+#define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, before, after)                       \
 template<typename T, typename = typename std::enable_if<!has_data<T>::value>::type> \
 void bin##oper(std::stream &s, T &dst, std::streamsize len = sizeof(T)) {           \
+    before;                                                                         \
     s.oper(reinterpret_cast<C>(&dst), len);                                         \
-    extra;                                                                          \
+    after;                                                                          \
 }                                                                                   \
                                                                                     \
 template<typename T, typename = typename std::enable_if<has_data<T>::value>::type>  \
@@ -40,10 +41,18 @@ void bin##oper(std::stream &s, T &dst) {                                        
     bin##oper(s, *dst.data(), dst.size() * sizeof(typename T::value_type));         \
 }
 
-AWEXM_DRY_AVOIDER_DEF(write, ostream, const char*,)
-AWEXM_DRY_AVOIDER_DEF(read,  istream, char*,
+AWEXM_DRY_AVOIDER_DEF(write, ostream, const char*
+		,
+		,
+)
+AWEXM_DRY_AVOIDER_DEF(read,  istream, char*
+	, // inainte de s.oper(...)
+	auto tell = s.tellg();
+
+	, // dupa
 	if (s.gcount() != len)
-		throw std::runtime_error("couldn't read " + std::to_string(len) + " bytes");
+		throw std::runtime_error("couldn't read " + std::to_string(len) + " bytes"
+		                       + " at offset " + std::to_string(tell));
 )
 
 }

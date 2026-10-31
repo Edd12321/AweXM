@@ -18,7 +18,7 @@ private:
 #define AWEXM_FILEHEADER_ENTRIES            \
     X(buffer<17>,    id_text)               \
     X(buffer<20>,    module_name)           \
-    X(std::uint8_t,  always_1a)             \
+    X(std::uint8_t,  always_0x1a)           \
     X(buffer<20>,    tracker_name)          \
     X(std::uint16_t, version_number)        \
     X(std::uint32_t, header_size)           \

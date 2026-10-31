@@ -1,3 +1,4 @@
+#include <cassert>
 #include <fstream>
 #include <stdexcept>
 #include <utility>
@@ -30,9 +31,18 @@ std::istream &operator>>(std::istream &in, FileHeader &xfh) {
 #define X(T, name) binread(in, xfh.name);
 	AWEXM_FILEHEADER_ENTRIES
 #undef X
-	auto np = xfh.number_of_patterns;
-	if (np) {
-		xfh.pattern_order_table.resize(np);
+	// "oficial", fisierele .xm trebuie sa aiba in
+	// pattern_order_table mereu 256 octeti.
+	//
+	// "neoficial", daca always_0x1a == 0x00, are
+	// de fapt doar song_length octeti in tabel
+	// (si .xm-ul se numeste stripped).
+	std::uint16_t lun;
+	assert(xfh.always_0x1a == 0x1A || xfh.always_0x1a == 0x00);
+	lun = ((xfh.always_0x1a == 0x1A) ? 256 : xfh.song_length);
+	
+	if (xfh.number_of_patterns) {
+		xfh.pattern_order_table.resize(lun);
 		binread(in, xfh.pattern_order_table);
 	}
 	return in;
