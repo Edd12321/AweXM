@@ -12,6 +12,12 @@ private:
 	vector<Sample> vs;
 public:
 	explicit Instrument(BinInstrument const&);
+	
+	[[nodiscard]] string get_name() const noexcept;
+	[[nodiscard]] const vector<Sample> &get_samples() const noexcept;
+	vector<Sample> &get_samples() noexcept;
+
+	friend ostream &operator<<(ostream&, const Instrument&);
 };
 
 }

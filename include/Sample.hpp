@@ -31,14 +31,16 @@ public:
 	Sample& operator=(Sample&&) = default;
 	explicit Sample(BinSampleHeader const&, vector<byte> const&);
 	
+	// [[nodiscard]] const BinSampleHeader &get_header() const noexcept;
 	[[nodiscard]] bit_type get_bit_type() const noexcept;
 	[[nodiscard]] loop_type get_loop_type() const noexcept;
-
+	
 	[[nodiscard]] const vector<sword> &get_data() const noexcept;
 	[[nodiscard]] sbyte get_finetune() const noexcept;
-	[[nodiscard]] const BinSampleHeader &get_header() const noexcept;
-	[[nodiscard]] string get_name() const;
+	[[nodiscard]] sbyte get_relative_note_number() const noexcept;
+	[[nodiscard]] byte get_panning() const noexcept;
 	[[nodiscard]] byte get_volume() const noexcept;
+	[[nodiscard]] string get_name() const;
 	
 	friend ostream &operator<<(ostream&, const Sample&);
 };

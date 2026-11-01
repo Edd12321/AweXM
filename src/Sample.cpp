@@ -37,8 +37,10 @@ vector<sword> Sample::adpcm2direct(const vector<byte> &d) const {
 		size_t idx = d[16 + i];
 		old += d[idx & 0xF];
 		ret[j] = static_cast<sword>(old * 256);
-		old += d[idx >> 4];
-		ret[j + 1] = static_cast<sword>(old * 256);
+		if (j + 1 < ret.size()) {
+			old += d[idx >> 4];
+			ret[j + 1] = static_cast<sword>(old * 256);
+		}
 	}
 	return ret;
 }
@@ -66,18 +68,25 @@ Sample::loop_type Sample::get_loop_type() const noexcept {
 	}
 }
 
+// const BinSampleHeader &Sample::get_header() const noexcept {
+// 	return h;
+// }
+
 const vector<sword> &Sample::get_data() const noexcept {
 	return data;
 }
 sbyte Sample::get_finetune() const noexcept {
 	return h.finetune;
 }
-const BinSampleHeader &Sample::get_header() const noexcept {
-	return h;
-}
 string Sample::get_name() const {
 	return {h.sample_name.begin(),
 		std::find(h.sample_name.begin(), h.sample_name.end(), '\0')};
+}
+byte Sample::get_panning() const noexcept {
+	return h.panning;
+}
+sbyte Sample::get_relative_note_number() const noexcept {
+	return h.relative_note_number;
 }
 byte Sample::get_volume() const noexcept {
 	return h.volume;
@@ -105,6 +114,8 @@ ostream &operator<<(ostream &out, const Sample &rhs) {
 	out << '\n';
 
 	out << "Finetune:" << rhs.get_finetune() << '\n';
+	out << "Relative note number:" << rhs.get_relative_note_number() << '\n';
+	out << "Panning:" << rhs.get_panning() << '\n';
 	out << "Volume: " << rhs.get_volume() << '\n';
 
 	out << '\n';
