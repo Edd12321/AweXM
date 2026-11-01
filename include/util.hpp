@@ -41,6 +41,15 @@ struct has_data<std::array<T, n>> {
 	static constexpr bool value = true;
 };
 
+template<typename T, size_t n>
+string arr2str(const array<T, n> &arr) {
+	return {arr.begin(), std::find(arr.begin(), arr.end(), '\0')};
+}
+
+string byte2hexstr(byte);
+string note2str(byte);
+string effect2str(byte, byte);
+
 #define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, before, after)                       \
 template<typename T, typename = typename std::enable_if<!has_data<T>::value>::type> \
 void bin##oper(std::stream &s, T &dst, std::streamsize len = sizeof(T)) {           \

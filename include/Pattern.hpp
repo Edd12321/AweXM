@@ -19,6 +19,12 @@ private:
 public:
 	Pattern() = default;
 	Pattern(const BinXMHeader&, const BinPattern&);
+
+	[[nodiscard]] const vector<vector<Cell>> &get_table() const noexcept {
+		return table;
+	}
+	
+	friend ostream &operator<<(ostream&, const Pattern&);
 };
 
 }

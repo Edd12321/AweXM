@@ -83,8 +83,7 @@ sbyte Sample::get_finetune() const noexcept {
 	return h.finetune;
 }
 string Sample::get_name() const {
-	return {h.sample_name.begin(),
-		std::find(h.sample_name.begin(), h.sample_name.end(), '\0')};
+	return arr2str(h.sample_name);
 }
 byte Sample::get_panning() const noexcept {
 	return h.panning;
@@ -117,10 +116,10 @@ ostream &operator<<(ostream &out, const Sample &rhs) {
 		out << ' ' << it;
 	out << '\n';
 
-	out << "Finetune:" << rhs.get_finetune() << '\n';
-	out << "Relative note number:" << rhs.get_relative_note_number() << '\n';
-	out << "Panning:" << rhs.get_panning() << '\n';
-	out << "Volume: " << rhs.get_volume() << '\n';
+	out << "Finetune :" << (int)rhs.get_finetune() << '\n';
+	out << "Relative note number: " << (int)rhs.get_relative_note_number() << '\n';
+	out << "Panning: " << (int)rhs.get_panning() << '\n';
+	out << "Volume: " << (int)rhs.get_volume() << '\n';
 
 	out << '\n';
 	return out;

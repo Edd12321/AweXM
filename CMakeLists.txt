@@ -74,6 +74,7 @@ target_sources(${MAIN_LIBRARY_NAME}
 		src/Module.cpp
 		src/Pattern.cpp
 		src/Sample.cpp
+		src/util.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

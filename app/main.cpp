@@ -9,5 +9,6 @@ int main(int argc, char **argv) {
 		return EXIT_SUCCESS; // EXIT_FAILURE;
 	}
 	AweXM::Module mod(argv[1]);
+	std::cout << mod << '\n';
 	return EXIT_SUCCESS;
 }
