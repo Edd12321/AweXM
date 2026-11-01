@@ -23,7 +23,12 @@ public:
 		SAMPLE8,
 		SAMPLE16
 	};
-	
+
+	Sample() = default;
+	Sample(Sample const&) = default;
+	Sample& operator=(Sample const&) = default;
+	Sample(Sample&&) = default;
+	Sample& operator=(Sample&&) = default;
 	explicit Sample(BinSampleHeader const&, vector<byte> const&);
 	
 	[[nodiscard]] bit_type get_bit_type() const noexcept;
