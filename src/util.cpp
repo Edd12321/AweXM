@@ -31,7 +31,7 @@ string effect2str(byte effect_type, byte effect_parameter) {
 	else {
 		if (effect_type <= 0x09)
 			ret += static_cast<char>(effect_type + '0');
-		else if (effect_type >= 0x0A && effect_type <= 0x21)
+		else if (effect_type <= 0x21)
 			ret += static_cast<char>(effect_type - 0xA + 'A');
 		else ret = "?";
 		ret += byte2hexstr(effect_parameter);
