@@ -90,8 +90,9 @@ void read_bin_sample_header(istream &in, BinSampleHeader &h) {
 	binread(in, h.panning);
 	binread(in, h.relative_note_number);
 	binread(in, h.delta_or_adpcm);
-	if (h.delta_or_adpcm != 0x00 && h.delta_or_adpcm != 0xAD)
-		throw std::runtime_error("bad delta_or_adpcm");
+	//if (h.delta_or_adpcm != 0x00 && h.delta_or_adpcm != 0xAD)
+	//	throw std::runtime_error("bad delta_or_adpcm "
+	//	    + std::to_string(h.delta_or_adpcm));
 	binread(in, h.sample_name);
 }
 

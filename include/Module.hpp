@@ -14,6 +14,7 @@ private:
 	vector<Instrument> instrs;
 public:
 	explicit Module(const BinModule&);
+	explicit Module(const std::string&);
 };
 
 }

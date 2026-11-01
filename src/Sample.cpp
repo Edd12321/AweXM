@@ -46,7 +46,7 @@ vector<sword> Sample::adpcm2direct(const vector<byte> &d) const {
 }
 
 Sample::Sample(BinSampleHeader const& h, vector<byte> const& data) : h(h) {
-	if (h.type & (1 << 4))
+	if (get_bit_type() == bit_type::SAMPLE16)
 		this->data = delta2direct16(data);
 	else if (h.delta_or_adpcm == 0xAD)
 		this->data = adpcm2direct(data);
@@ -66,6 +66,10 @@ Sample::loop_type Sample::get_loop_type() const noexcept {
 	default:
 		return loop_type::NO_LOOP;
 	}
+}
+
+Sample::bit_type Sample::get_bit_type() const noexcept {
+	return (h.type & (1 << 4)) ? bit_type::SAMPLE16 : bit_type::SAMPLE8;
 }
 
 // const BinSampleHeader &Sample::get_header() const noexcept {

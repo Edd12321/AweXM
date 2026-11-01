@@ -71,6 +71,8 @@ target_sources(${MAIN_LIBRARY_NAME}
     PRIVATE
 		src/Bin.cpp
 		src/Instrument.cpp
+		src/Module.cpp
+		src/Pattern.cpp
 		src/Sample.cpp
 )
 

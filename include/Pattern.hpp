@@ -14,10 +14,11 @@ public:
 		byte effect_type{};
 		byte effect_parameter{};
 	};
-	vector<vector<Cell>> table;
 private:
-	Pattern(const BinXMHeader&, const BinPattern&);
+	vector<vector<Cell>> table;
 public:
+	Pattern() = default;
+	Pattern(const BinXMHeader&, const BinPattern&);
 };
 
 }

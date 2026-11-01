@@ -2,6 +2,8 @@
 #define AWEXM_UTIL_HPP
 #include <array>
 #include <cstddef>
+#include <cstdint>
+#include <fstream>
 #include <iostream>
 #include <istream>
 #include <string>

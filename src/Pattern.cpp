@@ -9,7 +9,7 @@ Pattern::Pattern(const BinXMHeader &h, const BinPattern &p) {
 	auto nr = p.number_of_rows_in_pattern, nc = h.number_of_channels;
 	
 	auto getbyte = [&]() {
-		if (k == p.packed_pattern_data_size)
+		if (k >= p.packed_pattern_data_size)
 			throw std::runtime_error("malformed packed patterndata");
 		return p.packed_pattern_data[k++];
 	};
@@ -28,8 +28,11 @@ Pattern::Pattern(const BinXMHeader &h, const BinPattern &p) {
 				if (dbyt & 0x08) c.effect_type        = getbyte();
 				if (dbyt & 0x10) c.effect_parameter   = getbyte();
 			} else {
-				c.note = dbyt;
-				++i;
+				c.note               = dbyt;
+				c.instrument         = getbyte();
+				c.volume_column_byte = getbyte();
+				c.effect_type        = getbyte();
+				c.effect_parameter   = getbyte();
 			}
 		}
 	}

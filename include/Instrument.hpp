@@ -11,9 +11,9 @@ private:
 	BinInstrumentHeader h;
 	vector<Sample> vs;
 public:
-	explicit Instrument(BinInstrument const&);
+	explicit Instrument(const BinInstrument&);
 	
-	[[nodiscard]] string get_name() const noexcept;
+	[[nodiscard]] string get_name() const;
 	[[nodiscard]] const vector<Sample> &get_samples() const noexcept;
 	vector<Sample> &get_samples() noexcept;
 
