@@ -69,10 +69,9 @@ add_executable(${MAIN_EXECUTABLE_NAME}
 )
 target_sources(${MAIN_LIBRARY_NAME}
     PRIVATE
-		src/File.cpp
+		src/Bin.cpp
 		src/Instrument.cpp
-		src/Pattern.cpp
-		src/SampleHeader.cpp
+		src/Sample.cpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

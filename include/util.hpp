@@ -2,6 +2,7 @@
 #define AWEXM_UTIL_HPP
 #include <array>
 #include <cstddef>
+#include <iostream>
 #include <istream>
 #include <string>
 #include <stdexcept>
@@ -10,8 +11,20 @@
 
 namespace AweXM {
 
-template<std::size_t n>
-using buffer = std::array<std::uint8_t, n>;
+using byte   = std::uint8_t;
+using sbyte  = std::int8_t;
+using word   = std::uint16_t;
+using sword  = std::int16_t;
+using dword  = std::uint32_t;
+using sdword = std::int32_t;
+
+using std::size_t;
+
+using std::array;
+using std::istream;
+using std::ostream;
+using std::string;
+using std::vector;
 
 template<typename T>
 struct has_data {
