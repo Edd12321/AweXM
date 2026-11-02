@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <iostream>
 #include "Module.hpp"
-#include "util.hpp"
 
 int main(int argc, char **argv) {
 	if (argc == 1) {

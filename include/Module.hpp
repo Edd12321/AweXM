@@ -12,6 +12,10 @@ private:
 	BinXMHeader h;
 	vector<Pattern> pats;
 	vector<Instrument> instrs;
+
+	// pt playback
+	// word current_pattern{};
+	// word current_row{};
 public:
 	explicit Module(const BinModule&);
 	explicit Module(const std::string&);

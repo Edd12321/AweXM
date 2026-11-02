@@ -116,7 +116,7 @@ ostream &operator<<(ostream &out, const Sample &rhs) {
 		out << ' ' << it;
 	out << '\n';
 
-	out << "Finetune :" << (int)rhs.get_finetune() << '\n';
+	out << "Finetune: " << (int)rhs.get_finetune() << '\n';
 	out << "Relative note number: " << (int)rhs.get_relative_note_number() << '\n';
 	out << "Panning: " << (int)rhs.get_panning() << '\n';
 	out << "Volume: " << (int)rhs.get_volume() << '\n';
