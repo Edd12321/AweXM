@@ -29,9 +29,15 @@ private:
 		// efect curent
 		Pattern::Cell cell;
 		bool active{false};
-		word memory['Z' + 1] = {};
+		word memory['Z' + 1][32] = {};
 
 		word sample_pos{};
+
+		double period{};
+		word volume{};
+		byte panning{};
+
+		const Sample *sample = nullptr;
 	};
 	vector<ChannelState> chst;
 public:
@@ -43,8 +49,8 @@ public:
 		chst.resize(md.get_number_of_channels());
 	}
 	void advance();
-	static void process_cell_tick0(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
-	static void process_cell_rest(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
+	void process_cell_tick0(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
+	void process_cell_rest(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
 };
 
 }

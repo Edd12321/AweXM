@@ -39,4 +39,23 @@ string effect2str(byte effect_type, byte effect_parameter) {
 	return ret;
 }
 
+double note2period(byte note, int finetune, bool linear) {
+	// all of this is from xm-form.txt
+	static constexpr double period_tab[] = {
+		907, 900, 894, 887, 881, 875, 868, 862, 856, 850, 844, 838, 832, 826, 820, 814,
+		808, 802, 796, 791, 785, 779, 774, 768, 762, 757, 752, 746, 741, 736, 730, 725,
+		720, 715, 709, 704, 699, 694, 689, 684, 678, 675, 670, 665, 660, 655, 651, 646,
+		640, 636, 632, 628, 623, 619, 614, 610, 604, 601, 597, 592, 588, 584, 580, 575,
+		570, 567, 563, 559, 555, 551, 547, 543, 538, 535, 532, 528, 524, 520, 516, 513,
+		508, 505, 502, 498, 494, 491, 487, 484, 480, 477, 474, 470, 467, 463, 460, 457
+	};
+	auto ft = static_cast<int>(finetune / 16.);
+	if (linear)
+		return 7680 - note * 64 - finetune / 2.;
+
+	return period_tab[note % 12 * 8 + ft] * (1 - (ft - std::floor(ft)))
+	     + period_tab[note % 12 * 8 + ft] * (ft - std::floor(ft))
+	     * 16 * std::pow(2, note / 2);
+}
+
 }

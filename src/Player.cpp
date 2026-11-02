@@ -14,16 +14,63 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 		out.cell.note = cell.note;
 		out.sample_pos = 0;
 	}
+	if (!cell.effect_type && !xx)
+		return;
+	out.cell.effect_type = cell.effect_type;
+	out.cell.effect_parameter = xx;
+
+	switch (E) {
+	case 'B':
+		/* Position jump */ {
+			row_jump = true;
+			new_song_pos = xx;
+			row_jump_target = 0;
+		}
+		break;
+	case 'D':
+		/* Pattern break */ {
+			pattern_break = true;
+			row_jump_target = x * 10 + y;
+		}
+		break;
+	case 'C':
+		/* Set volume */ {
+			out.volume = xx < 64 ? xx : 64;
+		}
+		break;
+	case 'F':
+		/* Set speed */ {
+			if (x == 0) {
+				std::cerr << "invalid F arg " << x << '\n';
+				break;
+			}
+			if (x <= 31)
+				tempo = xx;
+			else bpm = xx;
+		}
+		break;
 
 	// wip
-	std::cerr << "DEBUG: " << E << ' ' << xx << ' ' << x << ' ' << y << '\n';
+	}
 }
 
 void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, char E, byte xx, byte x, byte y) {
-	// wip placeholder
-	// ill implement this later but i just need cppcheck to not complain
-	std::cerr << "DEBUG: " << E << ' ' << xx << ' ' << x << ' ' << y << ' ' << cell.note << '\n';
-	out.memory['0'] = 0;
+	if (!cell.effect_type && !xx)
+		return;
+	switch (E) {
+	case '0':
+		/* Arpeggio */ {
+			auto note = out.cell.note - 1;
+			switch (tick % 3) {
+			case 0: break;
+			case 1: note += x; break;
+			case 2: note += y; break;
+			}
+			out.period = note2period(note, out.sample->get_finetune(), m->get_linear());
+		}
+		break;
+	// wip
+	}
 }
 
 void Player::advance() {
