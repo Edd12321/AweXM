@@ -11,21 +11,22 @@ void Player::advance() {
 	const auto &T = m->get_patterns()[pot[order_idx]].get_table();
 
 	for (size_t i = 0; i < chst.size(); ++i) {
-		auto &state = chst[i];
-		const auto &cell = T[row][i];
+		// auto &state = chst[i];
+		// const auto &cell = T[row][i];
 
 		if (tick == 0) {
+			auto &state = chst[i];
+			const auto &cell = T[row][i];
+			
 			if (cell.instrument)
 				state.instrument_idx = cell.instrument;
 
-			if (cell.note) {
-				if (cell.note == 97)
-					state.active = false;
-				if (1 <= cell.note && cell.note <= 96) {
-					state.active     = true;
-					state.note       = cell.note;
-					state.sample_idx = 0;
-				}
+			if (cell.note == 97)
+				state.active = false;
+			if (1 <= cell.note && cell.note <= 96) {
+				state.active     = true;
+				state.note       = cell.note;
+				state.sample_idx = 0;
 			}
 
 			// ???

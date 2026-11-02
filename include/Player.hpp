@@ -27,12 +27,12 @@ private:
 	};
 	vector<ChannelState> chst;
 public:
-	void load(const Module &m) {
-		this->m = &m;
-		bpm = m.get_default_bpm();
-		tempo = m.get_default_tempo();
+	void load(const Module &md) {
+		m = &md;
+		bpm = md.get_default_bpm();
+		tempo = md.get_default_tempo();
 		tick = row = order_idx = 0;
-		chst.resize(m.get_number_of_channels());
+		chst.resize(md.get_number_of_channels());
 	}
 	void advance();
 };
