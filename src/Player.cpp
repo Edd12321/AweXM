@@ -21,7 +21,9 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 
 void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, char E, byte xx, byte x, byte y) {
 	// wip placeholder
-	std::cerr << "DEBUG: " << E << ' ' << xx << ' ' << x << ' ' << y << ' ' << cell.note << ' ' << out.cell.note << '\n';
+	// ill implement this later but i just need cppcheck to not complain
+	std::cerr << "DEBUG: " << E << ' ' << xx << ' ' << x << ' ' << y << ' ' << cell.note << '\n';
+	out.memory['0'] = 0;
 }
 
 void Player::advance() {
@@ -36,7 +38,7 @@ void Player::advance() {
 		if (first_tick)
 			state.cell = T[row][i];
 
-		char E;
+		char E = 0;
 		if (state.cell.effect_type && state.cell.effect_type <= 0x09)
 			E = static_cast<char>(state.cell.effect_type + '0');
 		else if (state.cell.effect_type <= 0x21)

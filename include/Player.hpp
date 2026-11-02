@@ -11,7 +11,7 @@ private:
 	const Module *m = nullptr;
 
 	size_t tick{};
-	word   pattern{};
+	// word   pattern{};
 	word   row{};
 	byte   song_pos{};
 	byte   new_song_pos{};
