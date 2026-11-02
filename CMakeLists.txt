@@ -73,6 +73,7 @@ target_sources(${MAIN_LIBRARY_NAME}
 		src/Instrument.cpp
 		src/Module.cpp
 		src/Pattern.cpp
+		src/Player.cpp
 		src/Sample.cpp
 		src/util.cpp
 )

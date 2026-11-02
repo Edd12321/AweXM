@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "Module.hpp"
+#include "Player.hpp"
 
 int main(int argc, char **argv) {
 	if (argc == 1) {
@@ -9,5 +10,9 @@ int main(int argc, char **argv) {
 	}
 	AweXM::Module mod(argv[1]);
 	std::cout << mod << '\n';
+
+	AweXM::Player p;
+	p.load(mod);
+	p.advance(); // just for cppcheck
 	return EXIT_SUCCESS;
 }
