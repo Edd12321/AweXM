@@ -4,7 +4,8 @@ AweXM is (soon to be) a tracker for the XM (eXtended Module) sample-based music 
 Documentation I used:
  - https://github.com/milkytracker/MilkyTracker/blob/master/resources/reference/xm-form.txt (contains some errors);
  - https://www.celersms.com/doc/XM_file_format.pdf;
- - https://pollak.thebe.de/b/the-xm-format/.
+ - https://pollak.thebe.de/b/the-xm-format/;
+ - https://www.a1k0n.net/2015/11/09/javascript-ft2-player.html.
 
 
 Below is the rest of the original template's README, in Romanian.
