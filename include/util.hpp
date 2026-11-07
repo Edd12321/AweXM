@@ -1,5 +1,6 @@
 #ifndef AWEXM_UTIL_HPP
 #define AWEXM_UTIL_HPP
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>

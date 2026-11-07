@@ -155,10 +155,8 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 				break;
 			}
 		}
-		out[2 * i] = static_cast<sword>(std::clamp(std::lround(L),
-		             static_cast<long>(INT16_MIN), static_cast<long>(INT16_MAX)));
-		out[2 * i + 1] = static_cast<sword>(std::clamp(std::lround(R),
-		             static_cast<long>(INT16_MIN), static_cast<long>(INT16_MAX)));
+		out[2 * i] = static_cast<sword>(std::min(std::max(-32768L, std::lround(L)), 32767L));
+		out[2 * i + 1] = static_cast<sword>(std::min(std::max(-32768L, std::lround(R)), 32767L));
 	}
 }
 
