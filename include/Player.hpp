@@ -9,6 +9,7 @@ namespace AweXM {
 class Player {
 private:
 	const Module *m = nullptr;
+	double frames_til_tick{};
 
 	size_t tick{};
 	// word   pattern{};
@@ -31,7 +32,7 @@ private:
 		bool active{false};
 		word memory['Z' + 1][32] = {};
 
-		word sample_pos{};
+		double sample_pos{};
 
 		double period{};
 		word volume{};
@@ -43,11 +44,14 @@ private:
 public:
 	void load(const Module &md) {
 		m = &md;
+		frames_til_tick = 0;
 		bpm = md.get_default_bpm();
 		tempo = md.get_default_tempo();
 		tick = row = song_pos = 0;
 		chst.resize(md.get_number_of_channels());
 	}
+	void play(double rate = 48000);
+	void render(sword*, size_t, double rate = 48000);
 	void advance();
 	void process_cell_tick0(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
 	void process_cell_rest(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);

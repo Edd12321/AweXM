@@ -9,10 +9,10 @@ int main(int argc, char **argv) {
 		return EXIT_SUCCESS; // EXIT_FAILURE;
 	}
 	AweXM::Module mod(argv[1]);
-	std::cout << mod << '\n';
+	std::cerr << mod << '\n';
 
 	AweXM::Player p;
 	p.load(mod);
-	p.advance(); // just for cppcheck
+	p.play();
 	return EXIT_SUCCESS;
 }

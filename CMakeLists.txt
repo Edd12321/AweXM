@@ -76,7 +76,7 @@ target_sources(${MAIN_LIBRARY_NAME}
 		src/Player.cpp
 		src/Sample.cpp
 		src/util.cpp
-)
+	)
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
 # NOTE: RUN_SANITIZERS is optional, if it's not present it will default to true

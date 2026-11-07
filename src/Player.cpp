@@ -13,6 +13,21 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 		out.active = true;
 		out.cell.note = cell.note;
 		out.sample_pos = 0;
+
+		const auto &I = m->get_instruments();
+		if (out.cell.instrument && out.cell.instrument <= I.size()) {
+			const auto &S = I[out.cell.instrument - 1].get_samples();
+			auto s_idx = I[out.cell.instrument - 1].get_sample_keymap_assignments()[cell.note - 1];
+
+			if (s_idx < S.size()) {
+				out.sample = &S[s_idx];
+				out.volume = out.sample->get_volume();
+				out.panning = out.sample->get_panning();
+				out.period = note2period(cell.note - 1 + out.sample->get_relative_note_number(),
+						out.sample->get_finetune(),
+						m->get_linear());
+			}
+		}
 	}
 	if (!cell.effect_type && !xx)
 		return;
@@ -40,11 +55,11 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 		break;
 	case 'F':
 		/* Set speed */ {
-			if (x == 0) {
-				std::cerr << "invalid F arg " << x << '\n';
+			if (xx == 0) {
+				std::cerr << "invalid F arg " << xx << '\n';
 				break;
 			}
-			if (x <= 31)
+			if (xx <= 31)
 				tempo = xx;
 			else bpm = xx;
 		}
@@ -66,10 +81,63 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 			case 1: note += x; break;
 			case 2: note += y; break;
 			}
+			if (!out.sample)
+				break;
 			out.period = note2period(note, out.sample->get_finetune(), m->get_linear());
 		}
 		break;
 	// wip
+	}
+}
+
+void Player::play(double rate) {
+	constexpr size_t cnt = 512;
+	vector<sword> buf(2 * cnt);
+	for (;;) {
+		render(buf.data(), cnt, rate);
+		binwrite(std::cout, buf);
+		std::cout.flush();
+	}
+}
+
+void Player::render(sword *out, size_t framecnt, double rate) {
+	for (size_t i = 0; i < framecnt; ++i, --frames_til_tick) {
+		// un row contine mai multe tickuri si un tick mai multe frameuri stereo
+		// cat de multe frameuri stereo incap intr-un tick?
+		// (ca sa stim pentru ce valori ale lui i apelam advance())
+		//
+		// raspuns:
+		// un tick dureaza 2.5/bpm secunde
+		// un frame dureaza 1/rate secunde (din definitie)
+		// cautam un n a.i. n*1/rate = 2.5/bpm
+		// => n = 2.5*rate/bpm
+		if (frames_til_tick <= 0.) {
+			advance();
+			frames_til_tick += 2.5 * rate / bpm;
+		}
+		double L = 0, R = 0;
+		for (auto &ch : chst) {
+			if (!ch.active || !ch.sample)
+				continue;
+			const auto &data = ch.sample->get_data();
+			auto j = static_cast<size_t>(ch.sample_pos);
+			if (j >= data.size()) {
+				ch.active = false;
+				break;
+			}
+			auto pan = ch.panning / 255.;
+			auto vol = ch.volume / 64.;
+
+			L += data[j] * vol * (1. - pan);
+			R += data[j] * vol * pan;
+
+			ch.sample_pos += period2freq(ch.period, m->get_linear()) / rate;
+
+		}
+		out[2 * i] = static_cast<sword>(std::clamp(std::lround(L),
+		             static_cast<long>(INT16_MIN), static_cast<long>(INT16_MAX)));
+		out[2 * i + 1] = static_cast<sword>(std::clamp(std::lround(R),
+		             static_cast<long>(INT16_MIN), static_cast<long>(INT16_MAX)));
 	}
 }
 
@@ -86,7 +154,7 @@ void Player::advance() {
 			state.cell = T[row][i];
 
 		char E = 0;
-		if (state.cell.effect_type && state.cell.effect_type <= 0x09)
+		if (state.cell.effect_type <= 0x09)
 			E = static_cast<char>(state.cell.effect_type + '0');
 		else if (state.cell.effect_type <= 0x21)
 			E = static_cast<char>(state.cell.effect_type - 0xA + 'A');

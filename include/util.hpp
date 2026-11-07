@@ -51,6 +51,7 @@ string byte2hexstr(byte);
 string note2str(byte);
 string effect2str(byte, byte);
 double note2period(byte, int, bool);
+double period2freq(double, bool);
 
 #define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, before, after)                       \
 template<typename T, typename = typename std::enable_if<!has_data<T>::value>::type> \

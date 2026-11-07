@@ -14,6 +14,7 @@ public:
 	explicit Instrument(const BinInstrument&);
 	
 	[[nodiscard]] string get_name() const;
+	[[nodiscard]] const array<byte, 96> &get_sample_keymap_assignments() const noexcept;
 	[[nodiscard]] const vector<Sample> &get_samples() const noexcept;
 	vector<Sample> &get_samples() noexcept;
 

@@ -49,13 +49,20 @@ double note2period(byte note, int finetune, bool linear) {
 		570, 567, 563, 559, 555, 551, 547, 543, 538, 535, 532, 528, 524, 520, 516, 513,
 		508, 505, 502, 498, 494, 491, 487, 484, 480, 477, 474, 470, 467, 463, 460, 457
 	};
-	auto ft = static_cast<int>(finetune / 16.);
+	auto ft = finetune / 16.;
+	int ift = static_cast<int>(std::floor(ft));
 	if (linear)
-		return 7680 - note * 64 - finetune / 2.;
+		return 7680. - note * 64. - finetune / 2.;
 
-	return period_tab[note % 12 * 8 + ft] * (1 - (ft - std::floor(ft)))
-	     + period_tab[note % 12 * 8 + ft] * (ft - std::floor(ft))
-	     * 16 * std::pow(2, note / 2);
+	return period_tab[note % 12 * 8 + ift] * (1 - (ft - ift))
+	     + period_tab[note % 12 * 8 + ift] * (ft - ift)
+	     * 16. * std::pow(2., note / 2.);
+}
+
+double period2freq(double period, bool linear) {
+	if (linear)
+		return 8363. * std::pow(2., (4608 - period) / 768.);
+	return 8363. * 1712. / period;
 }
 
 }

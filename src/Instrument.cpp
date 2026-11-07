@@ -21,12 +21,15 @@ vector<Sample> &Instrument::get_samples() noexcept {
 const vector<Sample> &Instrument::get_samples() const noexcept {
 	return vs;
 }
+const array<byte, 96> &Instrument::get_sample_keymap_assignments() const noexcept {
+	return h.sample_keymap_assignments;
+}
 
 ostream &operator<<(ostream &out, const Instrument &rhs) {
 	out << "(Instrument " << rhs.get_name() << ")\n";
 
 	out << "Samples: ";
-	for (const auto &it : rhs.get_samples())
+	for (const auto &it : rhs.vs)
 		out << ' ' << it;
 	out << '\n';
 
