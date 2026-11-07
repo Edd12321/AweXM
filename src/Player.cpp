@@ -36,6 +36,16 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 	out.cell.effect_parameter = xx;
 
 	switch (E) {
+	case '8':
+		/* Set panning */ {
+			out.panning = xx;
+		}
+		break;
+	case '9':
+		/* Sample offset */ {
+			out.sample_pos = xx;
+		}
+		break;
 	case 'B':
 		/* Position jump */ {
 			row_jump = true;
@@ -65,8 +75,6 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 			else bpm = xx;
 		}
 		break;
-
-	// wip
 	}
 }
 
@@ -87,7 +95,22 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 			out.period = note2period(note, out.sample->get_finetune(), m->get_linear());
 		}
 		break;
-	// wip
+	case '1':
+		/* Portamento up */ {
+			out.period -= 4 * xx;
+		}
+		break;
+	case '2':
+		/* Portamento down */ {
+			out.period += 4 * xx;
+		}
+		break;
+	case 'A':
+		/* Volume slide */ {
+			if (x)
+				out.volume += x;
+			else out.volume -= y;
+		}
 	}
 }
 
@@ -150,7 +173,7 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 				}
 				if (ch.sample_pos >= sample_end) {
 					ch.loop_dir *= -1;
-					ch.sample_pos = sample_end;
+					ch.sample_pos = sample_end - 1;
 				}
 				break;
 			}
