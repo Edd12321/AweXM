@@ -110,6 +110,7 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 			if (x)
 				out.volume += x;
 			else out.volume -= y;
+			out.volume = out.volume < 64 ? out.volume : 64;
 		}
 	}
 }
@@ -144,11 +145,15 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 			if (!ch.active || !ch.sample)
 				continue;
 			auto sample_end = ch.sample->get_sample_loop_start() + ch.sample->get_sample_loop_length();
+			auto sample_pos = static_cast<size_t>(std::max(0., ch.sample_pos));
+			sample_pos = std::min(sample_pos, ch.sample->get_data().size() - 1);
+			if (ch.sample->get_data().empty())
+				continue;
 
 			// mixare
-			L += ch.sample->get_data()[static_cast<size_t>(ch.sample_pos)]
+			L += ch.sample->get_data()[sample_pos]
 				* (ch.volume / 64.) * (1. - ch.panning / 255.);
-			R += ch.sample->get_data()[static_cast<size_t>(ch.sample_pos)]
+			R += ch.sample->get_data()[sample_pos]
 				* (ch.volume / 64.) * (ch.panning / 255.);
 
 			// avansare in sample in fct de viteza

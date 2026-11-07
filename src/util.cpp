@@ -56,7 +56,7 @@ double note2period(byte note, int finetune, bool linear) {
 
 	return period_tab[note % 12 * 8 + ift] * (1 - (ft - ift))
 	     + period_tab[note % 12 * 8 + ift] * (ft - ift)
-	     * 16. * std::pow(2., note / 2.);
+	     * 16. * std::pow(2., note / 2);
 }
 
 double period2freq(double period, bool linear) {
