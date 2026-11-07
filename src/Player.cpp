@@ -10,32 +10,39 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 	if (cell.note == 97)
 		out.active = false;
 	if (1 <= cell.note && cell.note <= 96) {
-		out.active = true;
 		out.cell.note = cell.note;
 		out.sample_pos = 0;
 		out.loop_dir = +1;
+		out.sample = nullptr;
 
 		const auto &I = m->get_instruments();
 		if (out.cell.instrument && out.cell.instrument <= I.size()) {
 			const auto &S = I[out.cell.instrument - 1].get_samples();
 			auto s_idx = I[out.cell.instrument - 1].get_sample_keymap_assignments()[cell.note - 1];
 
-			if (s_idx < S.size()) {
-				out.sample = &S[s_idx];
-				out.volume = out.sample->get_volume();
-				out.panning = out.sample->get_panning();
-				out.period = note2period(cell.note - 1 + out.sample->get_relative_note_number(),
-						out.sample->get_finetune(),
-						m->get_linear());
-			}
+			if (s_idx >= S.size())
+				s_idx = 0;
+
+			out.active = true;
+			out.sample = &S[s_idx];
+			out.volume = out.sample->get_volume();
+			out.panning = out.sample->get_panning();
+			out.period = note2period(cell.note - 1 + out.sample->get_relative_note_number(),
+					out.sample->get_finetune(),
+					m->get_linear());
 		}
 	}
 	if (!cell.effect_type && !xx)
 		return;
-	out.cell.effect_type = cell.effect_type;
-	out.cell.effect_parameter = xx;
 
 	switch (E) {
+	// cele care deja sunt facute in process_cell_rest
+	case '0': [[fallthrough]];
+	case 'A': [[fallthrough]];
+	case '1': [[fallthrough]];
+	case '2':
+		break;
+
 	case '8':
 		/* Set panning */ {
 			out.panning = xx;
@@ -43,7 +50,7 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 		break;
 	case '9':
 		/* Sample offset */ {
-			out.sample_pos = xx;
+			out.sample_pos = 256 * xx;
 		}
 		break;
 	case 'B':
@@ -53,15 +60,15 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 			row_jump_target = 0;
 		}
 		break;
+	case 'C':
+		/* Set volume */ {
+			out.volume = xx < 64 ? xx : 64;
+		}
+		break;
 	case 'D':
 		/* Pattern break */ {
 			pattern_break = true;
 			row_jump_target = x * 10 + y;
-		}
-		break;
-	case 'C':
-		/* Set volume */ {
-			out.volume = xx < 64 ? xx : 64;
 		}
 		break;
 	case 'F':
@@ -75,13 +82,27 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 			else bpm = xx;
 		}
 		break;
+	default:
+		std::cerr << "Unknown effect " << E << '\n';
+		break;
 	}
+	out.cell.effect_type = cell.effect_type;
+	out.cell.effect_parameter = xx;
 }
 
 void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, char E, byte xx, byte x, byte y) {
 	if (!cell.effect_type && !xx)
 		return;
 	switch (E) {
+	// cele care deja sunt facute in process_cell_tick0
+	case '8': [[fallthrough]];
+	case '9': [[fallthrough]];
+	case 'B': [[fallthrough]];
+	case 'C': [[fallthrough]];
+	case 'D': [[fallthrough]];
+	case 'F':
+		break;
+
 	case '0':
 		/* Arpeggio */ {
 			auto note = out.cell.note - 1;
@@ -107,11 +128,16 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 		break;
 	case 'A':
 		/* Volume slide */ {
+			int v = out.volume;
 			if (x)
-				out.volume += x;
-			else out.volume -= y;
-			out.volume = out.volume < 64 ? out.volume : 64;
+				v += x;
+			else v -= y;
+			out.volume = std::min(std::max(0, v), 64);
 		}
+		break;
+	default:
+		std::cerr << "Unknown effect " << E <<'\n';
+		break;
 	}
 }
 
@@ -144,11 +170,14 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 		for (auto &ch : chst) {
 			if (!ch.active || !ch.sample)
 				continue;
-			auto sample_end = ch.sample->get_sample_loop_start() + ch.sample->get_sample_loop_length();
-			auto sample_pos = static_cast<size_t>(std::max(0., ch.sample_pos));
-			sample_pos = std::min(sample_pos, ch.sample->get_data().size() - 1);
-			if (ch.sample->get_data().empty())
+			if (ch.sample->get_data().empty()) {
+				ch.active = false;
 				continue;
+			}
+			auto sample_end = ch.sample->get_sample_loop_start() + ch.sample->get_sample_loop_length();
+			auto sample_pos = static_cast<size_t>(std::max(0., std::floor(ch.sample_pos)));
+			sample_pos = std::min(sample_pos, ch.sample->get_data().size() - 1);
+
 
 			// mixare
 			L += ch.sample->get_data()[sample_pos]

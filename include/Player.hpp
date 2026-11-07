@@ -30,7 +30,7 @@ private:
 		// efect curent
 		Pattern::Cell cell;
 		bool active{false};
-		word memory['Z' + 1][32] = {};
+		word memory['Z' + 1][3] = {};
 
 		double sample_pos{};
 
