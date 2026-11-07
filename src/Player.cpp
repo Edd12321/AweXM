@@ -123,7 +123,6 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 			auto sample_end = ch.sample->get_sample_loop_start() + ch.sample->get_sample_loop_length();
 
 			// mixare
-			if (!ch.active) break;
 			L += ch.sample->get_data()[static_cast<size_t>(ch.sample_pos)]
 				* (ch.volume / 64.) * (1. - ch.panning / 255.);
 			R += ch.sample->get_data()[static_cast<size_t>(ch.sample_pos)]
