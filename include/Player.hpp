@@ -39,6 +39,7 @@ private:
 		byte panning{};
 
 		const Sample *sample = nullptr;
+		sbyte   loop_dir = +1;
 	};
 	vector<ChannelState> chst;
 public:
@@ -48,6 +49,7 @@ public:
 		bpm = md.get_default_bpm();
 		tempo = md.get_default_tempo();
 		tick = row = song_pos = 0;
+		chst.clear();
 		chst.resize(md.get_number_of_channels());
 	}
 	void play(double rate = 48000);

@@ -94,6 +94,12 @@ sbyte Sample::get_relative_note_number() const noexcept {
 byte Sample::get_volume() const noexcept {
 	return h.volume;
 }
+dword Sample::get_sample_loop_start() const noexcept {
+	return h.sample_loop_start;
+}
+dword Sample::get_sample_loop_length() const noexcept {
+	return h.sample_loop_length;
+}
 
 ostream &operator<<(ostream &out, const Sample &rhs) {
 	out << "(Sample " << rhs.get_name() << ": "

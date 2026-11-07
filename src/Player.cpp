@@ -13,6 +13,7 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 		out.active = true;
 		out.cell.note = cell.note;
 		out.sample_pos = 0;
+		out.loop_dir = +1;
 
 		const auto &I = m->get_instruments();
 		if (out.cell.instrument && out.cell.instrument <= I.size()) {
@@ -119,20 +120,41 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 		for (auto &ch : chst) {
 			if (!ch.active || !ch.sample)
 				continue;
-			const auto &data = ch.sample->get_data();
-			auto j = static_cast<size_t>(ch.sample_pos);
-			if (j >= data.size()) {
-				ch.active = false;
+			auto sample_end = ch.sample->get_sample_loop_start() + ch.sample->get_sample_loop_length();
+
+			// mixare
+			if (!ch.active) break;
+			L += ch.sample->get_data()[static_cast<size_t>(ch.sample_pos)]
+				* (ch.volume / 64.) * (1. - ch.panning / 255.);
+			R += ch.sample->get_data()[static_cast<size_t>(ch.sample_pos)]
+				* (ch.volume / 64.) * (ch.panning / 255.);
+
+			// avansare in sample in fct de viteza
+			ch.sample_pos += ch.loop_dir * period2freq(ch.period, m->get_linear()) / rate;
+
+			// looping
+			switch (ch.sample->get_loop_type()) {
+			case Sample::loop_type::FORWARD_LOOP:
+				if (ch.sample_pos >= sample_end)
+					ch.sample_pos = ch.sample->get_sample_loop_start();
+				break;
+
+			case Sample::loop_type::NO_LOOP:
+				if (static_cast<size_t>(ch.sample_pos) >= ch.sample->get_data().size())
+					ch.active = false;
+				break;
+			
+			case Sample::loop_type::PING_PONG_LOOP:
+				if (ch.loop_dir == -1 && ch.sample_pos <= ch.sample->get_sample_loop_start()) {
+					ch.loop_dir *= -1;
+					ch.sample_pos = ch.sample->get_sample_loop_start();
+				}
+				if (ch.sample_pos >= sample_end) {
+					ch.loop_dir *= -1;
+					ch.sample_pos = sample_end;
+				}
 				break;
 			}
-			auto pan = ch.panning / 255.;
-			auto vol = ch.volume / 64.;
-
-			L += data[j] * vol * (1. - pan);
-			R += data[j] * vol * pan;
-
-			ch.sample_pos += period2freq(ch.period, m->get_linear()) / rate;
-
 		}
 		out[2 * i] = static_cast<sword>(std::clamp(std::lround(L),
 		             static_cast<long>(INT16_MIN), static_cast<long>(INT16_MAX)));

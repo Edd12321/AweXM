@@ -34,7 +34,9 @@ public:
 	// [[nodiscard]] const BinSampleHeader &get_header() const noexcept;
 	[[nodiscard]] bit_type get_bit_type() const noexcept;
 	[[nodiscard]] loop_type get_loop_type() const noexcept;
-	
+
+	[[nodiscard]] dword get_sample_loop_start() const noexcept;
+	[[nodiscard]] dword get_sample_loop_length() const noexcept;
 	[[nodiscard]] const vector<sword> &get_data() const noexcept;
 	[[nodiscard]] sbyte get_finetune() const noexcept;
 	[[nodiscard]] sbyte get_relative_note_number() const noexcept;
