@@ -52,6 +52,8 @@ public:
 		chst.clear();
 		chst.resize(md.get_number_of_channels());
 	}
+	static void effmem_handle(ChannelState&, int, byte&, byte&, byte&);
+
 	void play(double rate = 48000);
 	void render(sword*, size_t, double rate = 48000);
 	void advance();

@@ -4,6 +4,37 @@
 
 namespace AweXM {
 
+void Player::effmem_handle(ChannelState &out, int E, byte &xx, byte &x, byte &y) {
+	constexpr char M[] = {'1', '2', '3', '9', 'A', 'H', 'P'}; // verificam xx      (byte)
+	constexpr char N[] = {'4', '7', 'R'};                     // verificam x sau y (nibble)
+	
+	for (char c : M) {
+		if (E == c) {
+			if (xx) {
+				out.memory[E][0] = x;
+				out.memory[E][1] = y;
+				out.memory[E][2] = xx;
+			} else {
+				x  = out.memory[E][0];
+				y  = out.memory[E][1];
+				xx = out.memory[E][2];
+			}
+		}
+	}
+	for (char c : N) {
+		if (E == c) {
+			if (x)      out.memory[E][0] = x;
+			else   x  = out.memory[E][0];
+
+			if (y)      out.memory[E][1] = y;
+			else   y  = out.memory[E][1];
+
+			if (x || y) out.memory[E][2] = xx;
+			else   xx = out.memory[E][2]; 
+		}
+	}
+}
+
 void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, char E, byte xx, byte x, byte y) {
 	if (cell.instrument)
 		out.cell.instrument = cell.instrument;
@@ -71,6 +102,33 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 			row_jump_target = x * 10 + y;
 		}
 		break;
+	case 'E':
+		switch (x) {
+		case 1:
+			/* Fine portamento up */ {
+				out.period -= 4 * y;
+			}
+			break;
+		case 2:
+			/* Fine portamento down */ {
+				out.period += 4 * y;
+			}
+			break;
+		case 'A' + (0xA - 'A'):
+			/* Fine volume slide up */ {
+				out.volume += y;
+			}
+			break;
+		case 'B' + (0xA - 'A'):
+			/* Fine volume slide down */ {
+				out.volume -= y;
+			}
+			break;
+		default:
+			std::cerr << "Unimplemented E" << byte2hexstr(x)[1] << '\n';
+			break;
+		}
+		break;
 	case 'F':
 		/* Set speed */ {
 			if (xx == 0) {
@@ -100,6 +158,7 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 	case 'B': [[fallthrough]];
 	case 'C': [[fallthrough]];
 	case 'D': [[fallthrough]];
+	case 'E': [[fallthrough]];
 	case 'F':
 		break;
 
@@ -124,6 +183,20 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 	case '2':
 		/* Portamento down */ {
 			out.period += 4 * xx;
+		}
+		break;
+	case '5':
+		/* Volume slide with tone portamento */ {
+			effmem_handle(out, 'A', xx, x, y);
+			process_cell_rest(cell, out, 'A', xx, x, y);
+			process_cell_rest(cell, out, '3', 00, 0, 0);
+		}
+		break;
+	case '6':
+		/* Volume slide with vibrato */ {
+			effmem_handle(out, 'A', xx, x, y);
+			process_cell_rest(cell, out, 'A', xx, x, y);
+			process_cell_rest(cell, out, '4', 00, 0, 0);
 		}
 		break;
 	case 'A':
@@ -235,9 +308,10 @@ void Player::advance() {
 		else if (state.cell.effect_type <= 0x21)
 			E = static_cast<char>(state.cell.effect_type - 0xA + 'A');
 		else std::cerr << "warning: bad effect " << state.cell.effect_type << '\n';
-		auto xx = state.cell.effect_parameter;
-		auto x = xx >> 4, y = xx & 0x0F;
-		
+		byte xx = state.cell.effect_parameter;
+		byte x = xx >> 4, y = xx & 0x0F;
+	
+		effmem_handle(state, E, xx, x, y);
 		if (first_tick)
 			process_cell_tick0(state.cell, state, E, xx, x, y);
 		else process_cell_rest(state.cell, state, E, xx, x, y);
