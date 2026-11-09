@@ -320,6 +320,34 @@ void Player::advance() {
 		if (first_tick)
 			state.cell = T[row][i];
 
+		//
+		// efecte #1 (vol)
+		//
+		byte V = state.cell.volume_column_byte;
+		bool voleffed = false;
+		auto voleff = [&](int E, byte ran, int T) {
+			if (voleffed) return;
+			if (V >= ran) {
+				voleffed = true;
+				byte xx = V - ran;
+				if (T == 0b10) xx <<= 4;
+				byte x = xx >> 4, y = xx & 0x0F;
+				effmem_handle(state, E, xx, x, y);
+			}
+		};
+		voleff('3', 0xF0, 0b11);
+		voleff('P', 0xE0, 0b10);
+		voleff('P', 0xD0, 0b01);
+		voleff('8', 0xC0, 0b11);
+		voleff('4', 0xB0, 0b01);
+		// wip
+		voleff('A', 0x70, 0b10);
+		voleff('A', 0x60, 0b01);
+		voleff('C', 0x10, 0b11);
+
+		//
+		// efecte #2 (normale)
+		//
 		char E = 0;
 		if (state.cell.effect_type <= 0x09)
 			E = static_cast<char>(state.cell.effect_type + '0');
@@ -328,7 +356,6 @@ void Player::advance() {
 		else std::cerr << "warning: bad effect " << state.cell.effect_type << '\n';
 		byte xx = state.cell.effect_parameter;
 		byte x = xx >> 4, y = xx & 0x0F;
-	
 		effmem_handle(state, E, xx, x, y);
 		if (first_tick)
 			process_cell_tick0(state.cell, state, E, xx, x, y);

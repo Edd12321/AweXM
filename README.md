@@ -1,4 +1,4 @@
-<img src="assets/logo.png" height=100 height=auto />
+<img src="assets/logo.png" height=70 height=auto />
 
 *AweXM* is a ~~soon to be~~ tracker for the XM (eXtended Module) sample-based music format, written for my uni's OOP course. The structure of the program is different from what I usually write (e. g. it has CMake, AGENTS.md, GitHub Actions, AGPL license) because it uses a template.
 
