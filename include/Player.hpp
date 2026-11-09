@@ -30,11 +30,11 @@ private:
 		// efect curent
 		Pattern::Cell cell;
 		bool active{false};
-		word memory['Z' + 1][3] = {};
+		word memory['Z' + 1][4] = {};
 
 		double sample_pos{};
 
-		double period{};
+		double period{}, target_period{};
 		word volume{};
 		byte panning{};
 
@@ -57,8 +57,8 @@ public:
 	void play(double rate = 48000);
 	void render(sword*, size_t, double rate = 48000);
 	void advance();
-	void process_cell_tick0(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
-	void process_cell_rest(const Pattern::Cell&, ChannelState&, char, byte, byte, byte);
+	void process_cell_tick0(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);
+	void process_cell_rest(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);
 };
 
 }

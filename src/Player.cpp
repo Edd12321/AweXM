@@ -35,7 +35,7 @@ void Player::effmem_handle(ChannelState &out, int E, byte &xx, byte &x, byte &y)
 	}
 }
 
-void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, char E, byte xx, byte x, byte y) {
+void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
 	if (cell.instrument)
 		out.cell.instrument = cell.instrument;
 	if (cell.note == 97)
@@ -71,9 +71,20 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 	case '0': [[fallthrough]];
 	case 'A': [[fallthrough]];
 	case '1': [[fallthrough]];
-	case '2':
+	case '2': [[fallthrough]];
+	case '6':
 		break;
 
+	case '3':
+		/* Tone portamento (#1) */ {
+			if (cell.note < 1 || cell.note > 96 || !out.sample)
+				break;
+			out.target_period = note2period(
+				cell.note - 1 + out.sample->get_relative_note_number(),
+				out.sample->get_finetune(),
+				m->get_linear());
+		}
+		break;
 	case '8':
 		/* Set panning */ {
 			out.panning = xx;
@@ -141,14 +152,14 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, ch
 		}
 		break;
 	default:
-		std::cerr << "Unknown effect " << E << '\n';
+		std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
 		break;
 	}
 	out.cell.effect_type = cell.effect_type;
 	out.cell.effect_parameter = xx;
 }
 
-void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, char E, byte xx, byte x, byte y) {
+void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
 	if (!cell.effect_type && !xx)
 		return;
 	switch (E) {
@@ -185,6 +196,13 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 			out.period += 4 * xx;
 		}
 		break;
+	case '3':
+		/* Tone portamento (#2) */ {
+			if (out.period < out.target_period)
+				out.period = std::max(out.target_period, out.period - 4 * xx);
+			else out.period = std::min(out.target_period, out.period + 4 * xx);
+		}
+		break;
 	case '5':
 		/* Volume slide with tone portamento */ {
 			effmem_handle(out, 'A', xx, x, y);
@@ -209,7 +227,7 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, cha
 		}
 		break;
 	default:
-		std::cerr << "Unknown effect " << E <<'\n';
+		std::cerr << "Unknown effect " << static_cast<char>(E) <<'\n';
 		break;
 	}
 }
