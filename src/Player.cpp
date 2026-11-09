@@ -35,13 +35,17 @@ void Player::effmem_handle(ChannelState &out, int E, byte &xx, byte &x, byte &y)
 	}
 }
 
-void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
+void Player::process_cell_tick0_init(const Pattern::Cell &cell, ChannelState &out, bool portamento) {
 	if (cell.instrument)
 		out.cell.instrument = cell.instrument;
 	if (cell.note == 97)
 		out.active = false;
 	if (1 <= cell.note && cell.note <= 96) {
 		out.cell.note = cell.note;
+
+		if (portamento)
+			return;
+
 		out.sample_pos = 0;
 		out.loop_dir = +1;
 		out.sample = nullptr;
@@ -63,6 +67,9 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, in
 					m->get_linear());
 		}
 	}
+}
+
+void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
 	if (!cell.effect_type && !xx)
 		return;
 
@@ -125,14 +132,14 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, in
 				out.period += 4 * y;
 			}
 			break;
-		case 'A' + (0xA - 'A'):
+		case 0xA:
 			/* Fine volume slide up */ {
-				out.volume += y;
+				out.volume = std::min(64, out.volume + y);
 			}
 			break;
-		case 'B' + (0xA - 'A'):
+		case 0xB:
 			/* Fine volume slide down */ {
-				out.volume -= y;
+				out.volume = std::max(0, out.volume - y);
 			}
 			break;
 		default:
@@ -155,15 +162,13 @@ void Player::process_cell_tick0(const Pattern::Cell &cell, ChannelState &out, in
 		std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
 		break;
 	}
-	out.cell.effect_type = cell.effect_type;
-	out.cell.effect_parameter = xx;
 }
 
-void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
+void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
 	if (!cell.effect_type && !xx)
 		return;
 	switch (E) {
-	// cele care deja sunt facute in process_cell_tick0
+	// cele care deja sunt facute in process_cell_tick0_eff
 	case '8': [[fallthrough]];
 	case '9': [[fallthrough]];
 	case 'B': [[fallthrough]];
@@ -183,7 +188,10 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, int
 			}
 			if (!out.sample)
 				break;
-			out.period = note2period(note, out.sample->get_finetune(), m->get_linear());
+			out.period = note2period(
+				note + out.sample->get_relative_note_number(),
+				out.sample->get_finetune(),
+				m->get_linear());
 		}
 		break;
 	case '1':
@@ -198,23 +206,24 @@ void Player::process_cell_rest(const Pattern::Cell &cell, ChannelState &out, int
 		break;
 	case '3':
 		/* Tone portamento (#2) */ {
-			if (out.period < out.target_period)
+			if (out.period > out.target_period)
 				out.period = std::max(out.target_period, out.period - 4 * xx);
-			else out.period = std::min(out.target_period, out.period + 4 * xx);
+			else if (out.period < out.target_period)
+				out.period = std::min(out.target_period, out.period + 4 * xx);
 		}
 		break;
 	case '5':
 		/* Volume slide with tone portamento */ {
 			effmem_handle(out, 'A', xx, x, y);
-			process_cell_rest(cell, out, 'A', xx, x, y);
-			process_cell_rest(cell, out, '3', 00, 0, 0);
+			process_cell_rest_eff(cell, out, 'A', xx, x, y);
+			process_cell_rest_eff(cell, out, '3', 00, 0, 0);
 		}
 		break;
 	case '6':
 		/* Volume slide with vibrato */ {
 			effmem_handle(out, 'A', xx, x, y);
-			process_cell_rest(cell, out, 'A', xx, x, y);
-			process_cell_rest(cell, out, '4', 00, 0, 0);
+			process_cell_rest_eff(cell, out, 'A', xx, x, y);
+			process_cell_rest_eff(cell, out, '4', 00, 0, 0);
 		}
 		break;
 	case 'A':
@@ -317,33 +326,93 @@ void Player::advance() {
 
 	for (size_t i = 0; i < chst.size(); ++i) {
 		auto &state = chst[i];
-		if (first_tick)
+		if (first_tick) {
 			state.cell = T[row][i];
+			state.cell.effect_type = T[row][i].effect_type;
+			state.cell.effect_parameter = T[row][i].effect_parameter;
+		}
+
+		if (first_tick)
+			process_cell_tick0_init(state.cell, state,
+			   (state.cell.volume_column_byte & 0xF0) == 0xF0
+			|| (state.cell.effect_type == 3)
+			|| (state.cell.effect_type == 5));
 
 		//
 		// efecte #1 (vol)
 		//
-		byte V = state.cell.volume_column_byte;
-		bool voleffed = false;
-		auto voleff = [&](int E, byte ran, int T) {
-			if (voleffed) return;
-			if (V >= ran) {
-				voleffed = true;
-				byte xx = V - ran;
-				if (T == 0b10) xx <<= 4;
-				byte x = xx >> 4, y = xx & 0x0F;
-				effmem_handle(state, E, xx, x, y);
+		byte V = state.cell.volume_column_byte, Vx = V & 0x0F;
+		switch (V & 0xF0) {
+		case 0x10: [[fallthrough]];
+		case 0x20: [[fallthrough]];
+		case 0x30: [[fallthrough]];
+		case 0x40: [[fallthrough]];
+		case 0x50:
+			/* (xx) Set volume */ {
+				if (first_tick)
+					process_cell_tick0_eff(state.cell, state, 'C', Vx - 0x10, 0, 0);
 			}
-		};
-		voleff('3', 0xF0, 0b11);
-		voleff('P', 0xE0, 0b10);
-		voleff('P', 0xD0, 0b01);
-		voleff('8', 0xC0, 0b11);
-		voleff('4', 0xB0, 0b01);
-		// wip
-		voleff('A', 0x70, 0b10);
-		voleff('A', 0x60, 0b01);
-		voleff('C', 0x10, 0b11);
+			break;
+		case 0x60:
+			/* (-x) Volume slide down */ {
+				if (!first_tick)
+					process_cell_rest_eff(state.cell, state, 'A', 0, 0, Vx);
+			}
+			break;
+		case 0x70:
+			/* (+x) Volume slide up */ {
+				if (!first_tick)
+					process_cell_rest_eff(state.cell, state, 'A', 0, Vx, 0);
+			}
+			break;
+		case 0x80:
+			/* (Dx) Fine volume slide down */ {
+				if (first_tick)
+					process_cell_tick0_eff(state.cell, state, 'E', 0, 0xB, Vx);
+			}
+			break;
+		case 0x90:
+			/* (Ux) Fine volume slide up */ {
+				if (first_tick)
+					process_cell_tick0_eff(state.cell, state, 'E', 0, 0xA, Vx);
+			}
+			break;
+		case 0xA0:
+			/* (Sx) Set vibrato speed */
+			std::cerr << "Unimplemented Sx\n";
+			break;
+		case 0xB0:
+			/* (Vx) Vibrato */
+			std::cerr << "Unimplemented Vx\n";
+			break;
+		case 0xC0:
+			/* (Px) Set panning position */ {
+				if (first_tick)
+					process_cell_tick0_eff(state.cell, state, '8', Vx * 17, 0, 0);
+			}
+			break;
+		case 0xD0:
+			/* (Lx) Panning slide left */ {
+				if (!first_tick)
+					process_cell_rest_eff(state.cell, state, 'P', 0, 0, Vx);
+			}
+			break;
+		case 0xE0:
+			/* (Rx) Panning slide right */ {
+				if (!first_tick)
+					process_cell_rest_eff(state.cell, state, 'P', 0, Vx, 0);
+			}
+			break;
+		case 0xF0:
+			/* (Mx) Tone portamento */ {
+				byte xx = Vx * 0x10, x = xx >> 4, y = xx & 0x0F;
+				effmem_handle(state, '3', xx, x, y);
+				if (first_tick)
+					process_cell_tick0_eff(state.cell, state, '3', xx, x, y);
+				else process_cell_rest_eff(state.cell, state, '3', xx, x, y);
+			}
+			break;
+		}
 
 		//
 		// efecte #2 (normale)
@@ -358,8 +427,8 @@ void Player::advance() {
 		byte x = xx >> 4, y = xx & 0x0F;
 		effmem_handle(state, E, xx, x, y);
 		if (first_tick)
-			process_cell_tick0(state.cell, state, E, xx, x, y);
-		else process_cell_rest(state.cell, state, E, xx, x, y);
+			process_cell_tick0_eff(state.cell, state, E, xx, x, y);
+		else process_cell_rest_eff(state.cell, state, E, xx, x, y);
 	}
 
 	// from pollak.thebe.de/b/the-xm-format:

@@ -19,6 +19,7 @@ private:
 
 	word   bpm{};
 	word   tempo{};
+	word   global_volume{};
 
 	bool   first_tick{true};
 	bool   pattern_break{false};
@@ -57,8 +58,9 @@ public:
 	void play(double rate = 48000);
 	void render(sword*, size_t, double rate = 48000);
 	void advance();
-	void process_cell_tick0(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);
-	void process_cell_rest(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);
+	void process_cell_tick0_init(const Pattern::Cell&, ChannelState&, bool portamento = false);
+	void process_cell_tick0_eff(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);
+	void process_cell_rest_eff(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);
 };
 
 }
