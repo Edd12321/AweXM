@@ -1,11 +1,14 @@
-# AweXM
-AweXM is (soon to be) a tracker for the XM (eXtended Module) sample-based music format, written for my uni's OOP course. The structure of the program is different from what I usually write (e. g. it has CMake, AGENTS.md, GitHub Actions, AGPL license) because it uses a template.
+<img src="assets/logo.png" height=100 height=auto />
+
+*AweXM* is a ~~soon to be~~ tracker for the XM (eXtended Module) sample-based music format, written for my uni's OOP course. The structure of the program is different from what I usually write (e. g. it has CMake, AGENTS.md, GitHub Actions, AGPL license) because it uses a template.
 
 Documentation I used:
  - https://github.com/milkytracker/MilkyTracker/blob/master/resources/reference/xm-form.txt (contains some errors);
  - https://www.celersms.com/doc/XM_file_format.pdf;
  - https://pollak.thebe.de/b/the-xm-format/;
  - https://www.a1k0n.net/2015/11/09/javascript-ft2-player.html.
+
+It currently supports basic playback via `ffplay`, and some modules sound okay as of right now. There are missing effects, though.
 
 
 Below is the rest of the original template's README, in Romanian.
