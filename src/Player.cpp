@@ -158,6 +158,9 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 			else bpm = xx;
 		}
 		break;
+	case 'G':
+		global_volume = xx < 64 ? xx : 64;
+		break;
 	default:
 		std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
 		break;
@@ -175,7 +178,8 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 	case 'C': [[fallthrough]];
 	case 'D': [[fallthrough]];
 	case 'E': [[fallthrough]];
-	case 'F':
+	case 'F': [[fallthrough]];
+	case 'G':
 		break;
 
 	case '0':
@@ -281,9 +285,9 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 
 			// mixare
 			L += ch.sample->get_data()[sample_pos]
-				* (ch.volume / 64.) * (1. - ch.panning / 255.);
+				* (ch.volume / 64.) * (global_volume / 64.) * (1. - ch.panning / 255.);
 			R += ch.sample->get_data()[sample_pos]
-				* (ch.volume / 64.) * (ch.panning / 255.);
+				* (ch.volume / 64.) * (global_volume / 64.) * (ch.panning / 255.);
 
 			// avansare in sample in fct de viteza
 			ch.sample_pos += ch.loop_dir * period2freq(ch.period, m->get_linear()) / rate;
@@ -388,7 +392,7 @@ void Player::advance() {
 		case 0xC0:
 			/* (Px) Set panning position */ {
 				if (first_tick)
-					process_cell_tick0_eff(state.cell, state, '8', Vx * 17, 0, 0);
+					process_cell_tick0_eff(state.cell, state, '8', Vx * 10, 0, 0);
 			}
 			break;
 		case 0xD0:

@@ -29,7 +29,7 @@ ostream &operator<<(ostream &out, const Instrument &rhs) {
 	out << "(Instrument " << rhs.get_name() << ")\n";
 
 	out << "Samples: ";
-	for (const auto &it : rhs.vs)
+	for (const auto &it : rhs.get_samples())
 		out << ' ' << it;
 	out << '\n';
 

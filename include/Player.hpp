@@ -19,7 +19,7 @@ private:
 
 	word   bpm{};
 	word   tempo{};
-	word   global_volume{};
+	word   global_volume{64};
 
 	bool   first_tick{true};
 	bool   pattern_break{false};
@@ -45,11 +45,10 @@ private:
 	vector<ChannelState> chst;
 public:
 	void load(const Module &md) {
+		*this = Player();
 		m = &md;
-		frames_til_tick = 0;
 		bpm = md.get_default_bpm();
 		tempo = md.get_default_tempo();
-		tick = row = song_pos = 0;
 		chst.clear();
 		chst.resize(md.get_number_of_channels());
 	}
