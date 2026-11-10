@@ -151,6 +151,11 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 				out.volume = std::max(0, out.volume - y);
 			}
 			break;
+		case 0xE:
+			/* Pattern delay */ {
+				repeat_row = y;
+			}
+			break;
 		default:
 			std::cerr << "Unimplemented E" << byte2hexstr(x)[1] << '\n';
 			break;
@@ -250,6 +255,15 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 				v += x;
 			else v -= y;
 			out.volume = std::min(std::max(0, v), 64);
+		}
+		break;
+	case 'P':
+		/* Panning slide */ {
+			int p = out.panning;
+			if (x)
+				p += x;
+			else p -= y;
+			out.panning = std::max(0, p);
 		}
 		break;
 	case 'K':

@@ -32,11 +32,11 @@ ostream &operator<<(ostream &out, const Module &rhs) {
 	out << "Default BPM: " << rhs.get_default_bpm() << '\n';
 	out << "PATTERNS\n--------\n";
 	size_t k = 0;
-	for (const auto &it : rhs.get_patterns())
+	for (const auto &it : rhs.pats)
 		out << "(Pattern #" << ++k << ")\n" << it << '\n';
 	out << "\nINSTRUMENTS\n-----------\n";
 	k = 0;
-	for (const auto &it : rhs.get_instruments())
+	for (const auto &it : rhs.instrs)
 		out << "(Instrument #" << ++k << ")\n" << it << '\n';
 	return out;
 }
