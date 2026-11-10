@@ -15,7 +15,7 @@ private:
 	// word   pattern{};
 	word   row{};
 	byte   song_pos{};
-	byte   new_song_pos{};
+	byte   new_song_pos{1};
 
 	word   bpm{};
 	word   tempo{};
