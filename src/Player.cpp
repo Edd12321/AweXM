@@ -170,6 +170,10 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 	case 'G':
 		global_volume = xx < 64 ? xx : 64;
 		break;
+	case 'K':
+		if (xx == tick)
+			out.active = false;
+		break;
 	default:
 		std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
 		break;
@@ -247,6 +251,10 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 			else v -= y;
 			out.volume = std::min(std::max(0, v), 64);
 		}
+		break;
+	case 'K':
+		if (x == tick)
+			out.active = false;
 		break;
 	default:
 		std::cerr << "Unknown effect " << static_cast<char>(E) <<'\n';
