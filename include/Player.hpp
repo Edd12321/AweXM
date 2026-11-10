@@ -44,14 +44,7 @@ private:
 	};
 	vector<ChannelState> chst;
 public:
-	void load(const Module &md) {
-		*this = Player();
-		m = &md;
-		bpm = md.get_default_bpm();
-		tempo = md.get_default_tempo();
-		chst.clear();
-		chst.resize(md.get_number_of_channels());
-	}
+	void load(const Module &md);
 	static void effmem_handle(ChannelState&, int, byte&, byte&, byte&);
 
 	void play(double rate = 48000);

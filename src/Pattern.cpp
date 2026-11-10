@@ -4,6 +4,10 @@
 
 namespace AweXM {
 
+const vector<vector<Pattern::Cell>> &Pattern::get_table() const noexcept {
+	return table;
+}
+
 Pattern::Pattern(const BinXMHeader &h, const BinPattern &p) {
 	size_t k = 0;
 	auto nr = p.number_of_rows_in_pattern, nc = h.number_of_channels;

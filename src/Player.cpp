@@ -4,6 +4,15 @@
 
 namespace AweXM {
 
+void Player::load(const Module &md) {
+	*this = Player();
+	m = &md;
+	bpm = md.get_default_bpm();
+	tempo = md.get_default_tempo();
+	chst.clear();
+	chst.resize(md.get_number_of_channels());
+}
+
 void Player::effmem_handle(ChannelState &out, int E, byte &xx, byte &x, byte &y) {
 	constexpr char M[] = {'1', '2', '3', '9', 'A', 'H', 'P'}; // verificam xx      (byte)
 	constexpr char N[] = {'4', '7', 'R'};                     // verificam x sau y (nibble)
