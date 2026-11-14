@@ -91,7 +91,8 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 	case 'A': [[fallthrough]];
 	case '1': [[fallthrough]];
 	case '2': [[fallthrough]];
-	case '6':
+	case '6': [[fallthrough]];
+	case 'H':
 		break;
 
 	case '3':
@@ -191,11 +192,15 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 		}
 		break;
 	case 'G':
-		global_volume = xx < 64 ? xx : 64;
+		/* Set global volume */ {
+			global_volume = xx < 64 ? xx : 64;
+		}
 		break;
 	case 'K':
-		if (xx == tick)
-			out.active = false;
+		/* Key off (#1) */ {
+			if (xx == tick)
+				out.active = false;
+		}
 		break;
 	default:
 		std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
@@ -289,6 +294,15 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 			out.volume = std::min(std::max(0, v), 64);
 		}
 		break;
+	case 'H':
+		/* Global volume slide */ {
+			int v = global_volume;
+			if (x)
+				v += x;
+			else v -= y;
+			global_volume = std::min(std::max(0, v), 64);
+		}
+		break;
 	case 'P':
 		/* Panning slide */ {
 			int p = out.panning;
@@ -299,8 +313,8 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 		}
 		break;
 	case 'K':
-		/* Key off */ {
-			if (x == tick)
+		/* Key off (#2) */ {
+			if (xx == tick)
 				out.active = false;
 			break;
 		}
@@ -411,17 +425,9 @@ void Player::advance() {
 		// efecte #1 (vol)
 		//
 		byte V = state.cell.volume_column_byte, Vx = V & 0x0F;
-		switch (V & 0xF0) {
-		case 0x10: [[fallthrough]];
-		case 0x20: [[fallthrough]];
-		case 0x30: [[fallthrough]];
-		case 0x40: [[fallthrough]];
-		case 0x50:
-			/* (xx) Set volume */ {
-				if (first_tick)
-					process_cell_tick0_eff(state.cell, state, 'C', Vx - 0x10, 0, 0);
-			}
-			break;
+		if (V >= 0x10 && V <= 0x50 && first_tick)
+			process_cell_tick0_eff(state.cell, state, 'C', Vx - 0x10, 0, 0);
+		else switch (V & 0xF0) {
 		case 0x60:
 			/* (-x) Volume slide down */ {
 				if (!first_tick)
@@ -447,8 +453,11 @@ void Player::advance() {
 			}
 			break;
 		case 0xA0:
-			/* (Sx) Set vibrato speed */
-			std::cerr << "Unimplemented Sx\n";
+			/* (Sx) Set vibrato speed */ {
+				byte xx = Vx * 0x10, x = xx >> 4, y = xx & 0x0F;
+				if (first_tick)
+					effmem_handle(state, '4', xx, x, y);
+			}
 			break;
 		case 0xB0:
 			/* (Vx) Vibrato */
@@ -457,7 +466,7 @@ void Player::advance() {
 		case 0xC0:
 			/* (Px) Set panning position */ {
 				if (first_tick)
-					process_cell_tick0_eff(state.cell, state, '8', Vx * 10, 0, 0);
+					process_cell_tick0_eff(state.cell, state, '8', Vx * 0x10, 0, 0);
 			}
 			break;
 		case 0xD0:
