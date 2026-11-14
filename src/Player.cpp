@@ -145,17 +145,17 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 		break;
 	case 'E':
 		switch (x) {
-		case 1:
+		case 0x1:
 			/* Fine portamento up */ {
 				out.period -= 4 * y;
 			}
 			break;
-		case 2:
+		case 0x2:
 			/* Fine portamento down */ {
 				out.period += 4 * y;
 			}
 			break;
-		case 4:
+		case 0x4:
 			/* Set vibrato waveform */ {
 				out.vibrato_wave = y < 3 ? y : 3;
 			}
@@ -168,6 +168,12 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 		case 0xB:
 			/* Fine volume slide down */ {
 				out.volume = std::max(0, out.volume - y);
+			}
+			break;
+		case 0xC:
+			/* Note cut (#1) */ {
+				if (tick == xx)
+					out.volume = 0;
 			}
 			break;
 		case 0xE:
@@ -209,7 +215,7 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 }
 
 void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out, int E, byte xx, byte x, byte y) {
-	if (!cell.effect_type && !xx)
+	if (E == '0' && !cell.effect_type && !xx)
 		return;
 	switch (E) {
 	// cele care deja sunt facute in process_cell_tick0_eff
@@ -218,7 +224,6 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 	case 'B': [[fallthrough]];
 	case 'C': [[fallthrough]];
 	case 'D': [[fallthrough]];
-	case 'E': [[fallthrough]];
 	case 'F': [[fallthrough]];
 	case 'G':
 		break;
@@ -283,6 +288,22 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 			effmem_handle(out, 'A', xx, x, y);
 			process_cell_rest_eff(cell, out, 'A', xx, x, y);
 			process_cell_rest_eff(cell, out, '4', 00, 0, 0);
+		}
+		break;
+	case 'E':
+		switch (x) {
+		case 0x1: [[fallthrough]];
+		case 0x2: [[fallthrough]];
+		case 0x4: [[fallthrough]];
+		case 0xA: [[fallthrough]];
+		case 0xB:
+			break;
+		case 0xC:
+			/* Note cut (#2) */ {
+				if (tick == xx)
+					out.volume = 0;
+			}
+			break;
 		}
 		break;
 	case 'A':
@@ -426,7 +447,7 @@ void Player::advance() {
 		//
 		byte V = state.cell.volume_column_byte, Vx = V & 0x0F;
 		if (V >= 0x10 && V <= 0x50 && first_tick)
-			process_cell_tick0_eff(state.cell, state, 'C', Vx - 0x10, 0, 0);
+			process_cell_tick0_eff(state.cell, state, 'C', V - 0x10, 0, 0);
 		else switch (V & 0xF0) {
 		case 0x60:
 			/* (-x) Volume slide down */ {
