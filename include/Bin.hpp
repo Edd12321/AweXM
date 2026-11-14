@@ -27,6 +27,7 @@ struct BinPattern {
 	byte            packing_byte{};
 	word            number_of_rows_in_pattern{};
 	word            packed_pattern_data_size{};
+	vector<byte>    garbage;
 	vector<byte>    packed_pattern_data{};
 };
 

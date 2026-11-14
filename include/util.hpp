@@ -1,8 +1,10 @@
 #ifndef AWEXM_UTIL_HPP
 #define AWEXM_UTIL_HPP
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <fstream>

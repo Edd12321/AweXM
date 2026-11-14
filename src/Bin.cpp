@@ -44,8 +44,13 @@ void read_bin_pattern(istream &in, BinPattern &h) {
 	binread(in, h.packing_byte);
 	binread(in, h.number_of_rows_in_pattern);
 	binread(in, h.packed_pattern_data_size);
-	h.packed_pattern_data.resize(h.packed_pattern_data_size);
-	binread(in, h.packed_pattern_data);
+	if (h.packed_pattern_data_size) {
+		h.packed_pattern_data.resize(h.packed_pattern_data_size);
+		binread(in, h.packed_pattern_data);
+	} else if (h.pattern_header_length > 9) {
+		h.garbage.resize(h.pattern_header_length - 9);
+		binread(in, h.garbage);
+	}
 }
 
 void read_bin_instrument_header(istream &in, BinInstrumentHeader &h) {
