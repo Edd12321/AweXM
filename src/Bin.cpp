@@ -5,7 +5,7 @@ namespace AweXM {
 void read_bin_xm_header(istream &in, BinXMHeader &h) {
 	binread(in, h.id_text);
 	binread(in, h.module_name);
-	binread(in, h.stripped_flag);
+	binread(in, h.always_0x1a);
 	binread(in, h.tracker_name);
 	binread(in, h.version_number);
 	if (h.version_number != 0x0104)
@@ -14,17 +14,10 @@ void read_bin_xm_header(istream &in, BinXMHeader &h) {
 	binread(in, h.header_size);
 	binread(in, h.song_length);
 	size_t pt_len;
-	switch (h.stripped_flag) {
-	case 0x1A:
+	if (h.header_size == 276)
 		pt_len = 256;
-		break;
-	case 0x00:
+	else	
 		pt_len = h.song_length;
-		break;
-	default:
-		throw std::runtime_error("invalid 38th byte "
-		    + std::to_string(h.stripped_flag));
-	}
 	if (h.song_length < 1 || h.song_length > 256)
 		throw std::runtime_error("invalid song length "
 		    + std::to_string(h.song_length));
@@ -39,17 +32,23 @@ void read_bin_xm_header(istream &in, BinXMHeader &h) {
 	binread(in, h.pattern_order_table);
 }
 
-void read_bin_pattern(istream &in, BinPattern &h) {
+void read_bin_pattern(istream &in, BinPattern &h, BinXMHeader const &xh) {
 	binread(in, h.pattern_header_length);
 	binread(in, h.packing_byte);
 	binread(in, h.number_of_rows_in_pattern);
 	binread(in, h.packed_pattern_data_size);
-	if (h.packed_pattern_data_size) {
-		h.packed_pattern_data.resize(h.packed_pattern_data_size);
-		binread(in, h.packed_pattern_data);
-	} else if (h.pattern_header_length > 9) {
+	if (h.pattern_header_length > 9) {
 		h.garbage.resize(h.pattern_header_length - 9);
 		binread(in, h.garbage);
+	}
+	if (!h.packed_pattern_data_size) {
+		h.pattern_header_length = 9;
+		h.number_of_rows_in_pattern = 64;
+		h.packed_pattern_data_size = 64 * xh.number_of_channels;
+		h.packed_pattern_data = vector<byte>(h.packed_pattern_data_size, 0x80);
+	} else {
+		h.packed_pattern_data.resize(h.packed_pattern_data_size);
+		binread(in, h.packed_pattern_data);
 	}
 }
 

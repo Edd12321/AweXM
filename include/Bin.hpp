@@ -7,7 +7,7 @@ namespace AweXM {
 struct BinXMHeader {
 	array<char, 17> id_text{};
 	array<char, 20> module_name{};
-	byte            stripped_flag{};
+	byte            always_0x1a{};
 	array<char, 20> tracker_name{};
 	word            version_number{};
 	dword           header_size{};
@@ -87,7 +87,7 @@ struct BinModule {
 };
 
 void read_bin_xm_header(istream&, BinXMHeader&);
-void read_bin_pattern(istream&, BinPattern&);
+void read_bin_pattern(istream&, BinPattern&, BinXMHeader const &xh = {});
 void read_bin_instrument_header(istream&, BinInstrumentHeader&);
 void read_bin_sample_header(istream&, BinSampleHeader&);
 void read_bin_instrument(istream&, BinInstrument&);

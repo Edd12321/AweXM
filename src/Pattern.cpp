@@ -14,7 +14,7 @@ Pattern::Pattern(const BinXMHeader &h, const BinPattern &p) {
 	
 	auto getbyte = [&]() {
 		if (k >= p.packed_pattern_data_size)
-			throw std::runtime_error("malformed packed patterndata");
+			return static_cast<byte>(0x80);
 		return p.packed_pattern_data[k++];
 	};
 
