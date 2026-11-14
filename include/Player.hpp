@@ -35,9 +35,13 @@ private:
 
 		double sample_pos{};
 
-		double period{}, target_period{};
+		double period{}, target_period{}, p_temp{};
 		word volume{};
 		byte panning{};
+
+		bool   vibrato_played{false};
+		int    vibrato_wave{};
+		int    vibrato_idx{};
 
 		const Sample *sample = nullptr;
 		sbyte   loop_dir = +1;

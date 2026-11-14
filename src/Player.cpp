@@ -55,9 +55,11 @@ void Player::process_cell_tick0_init(const Pattern::Cell &cell, ChannelState &ou
 		if (portamento)
 			return;
 
-		out.sample_pos = 0;
-		out.loop_dir = +1;
-		out.sample = nullptr;
+		out.vibrato_played =  false;
+		out.sample         =  nullptr;
+		out.loop_dir       = +1;
+		out.sample_pos     =  0;
+		out.p_temp         =  0;
 
 		const auto &I = m->get_instruments();
 		if (out.cell.instrument && out.cell.instrument <= I.size()) {
@@ -67,11 +69,12 @@ void Player::process_cell_tick0_init(const Pattern::Cell &cell, ChannelState &ou
 			if (s_idx >= S.size())
 				s_idx = 0;
 
-			out.active = true;
-			out.sample = &S[s_idx];
-			out.volume = out.sample->get_volume();
+			out.active  = true;
+			out.sample  = &S[s_idx];
+			out.volume  = out.sample->get_volume();
 			out.panning = out.sample->get_panning();
-			out.period = note2period(cell.note - 1 + out.sample->get_relative_note_number(),
+			out.period  = note2period(
+					cell.note - 1 + out.sample->get_relative_note_number(),
 					out.sample->get_finetune(),
 					m->get_linear());
 		}
@@ -99,6 +102,16 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 				cell.note - 1 + out.sample->get_relative_note_number(),
 				out.sample->get_finetune(),
 				m->get_linear());
+		}
+		break;
+	case '4':
+		/* Vibrato (#1) */ {
+			if (out.vibrato_played) {
+				out.p_temp = 2 * y * wave[out.vibrato_wave](out.vibrato_idx);
+				out.vibrato_idx = (out.vibrato_idx + x) % 64;
+			}
+			if (cell.note >= 1 && cell.note <= 96)
+				out.vibrato_played = true;
 		}
 		break;
 	case '8':
@@ -139,6 +152,11 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 		case 2:
 			/* Fine portamento down */ {
 				out.period += 4 * y;
+			}
+			break;
+		case 4:
+			/* Set vibrato waveform */ {
+				out.vibrato_wave = y < 3 ? y : 3;
 			}
 			break;
 		case 0xA:
@@ -202,18 +220,26 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 
 	case '0':
 		/* Arpeggio */ {
-			auto note = out.cell.note - 1;
+			auto off = 0;
 			switch (tick % 3) {
 			case 0: break;
-			case 1: note += x; break;
-			case 2: note += y; break;
+			case 1: off = x; break;
+			case 2: off = y; break;
 			}
 			if (!out.sample)
 				break;
-			out.period = note2period(
-				note + out.sample->get_relative_note_number(),
-				out.sample->get_finetune(),
-				m->get_linear());
+			if (m->get_linear()) {
+				// p + p_temp = 7680 - 64*(n + off) - f/2
+				// p = 7680 - 64*n - f/2
+				// .: p_temp = -64*off
+				out.p_temp = -64 * off; 
+			} else {
+				// placeholder pana imi dau seama
+				out.period = note2period(
+					out.cell.note + off - 1 + out.sample->get_relative_note_number(),
+					out.sample->get_finetune(),
+					false);
+			}
 		}
 		break;
 	case '1':
@@ -232,6 +258,12 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 				out.period = std::max(out.target_period, out.period - 4 * xx);
 			else if (out.period < out.target_period)
 				out.period = std::min(out.target_period, out.period + 4 * xx);
+		}
+		break;
+	case '4':
+		/* Vibrato (#2) */ {
+			out.p_temp = 2 * y * wave[out.vibrato_wave](out.vibrato_idx);
+			out.vibrato_idx = (out.vibrato_idx + x) % 64;
 		}
 		break;
 	case '5':
@@ -267,9 +299,11 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 		}
 		break;
 	case 'K':
-		if (x == tick)
-			out.active = false;
-		break;
+		/* Key off */ {
+			if (x == tick)
+				out.active = false;
+			break;
+		}
 	default:
 		std::cerr << "Unknown effect " << static_cast<char>(E) <<'\n';
 		break;
@@ -321,7 +355,7 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 				* (ch.volume / 64.) * (global_volume / 64.) * (ch.panning / 255.);
 
 			// avansare in sample in fct de viteza
-			ch.sample_pos += ch.loop_dir * period2freq(ch.period, m->get_linear()) / rate;
+			ch.sample_pos += ch.loop_dir * period2freq(ch.period + ch.p_temp , m->get_linear()) / rate;
 
 			// looping
 			switch (ch.sample->get_loop_type()) {

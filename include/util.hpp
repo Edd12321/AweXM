@@ -30,6 +30,8 @@ using std::ostream;
 using std::string;
 using std::vector;
 
+extern array<double(*)(size_t), 3> wave;
+
 template<typename T>
 struct has_data {
 	static constexpr bool value = false;

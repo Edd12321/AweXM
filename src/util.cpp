@@ -2,6 +2,12 @@
 
 namespace AweXM {
 
+array<double(*)(size_t), 3> wave = {
+	[](size_t i) { return sin(2 * M_PI * static_cast<double>(i) / 64); },
+	[](size_t i) { return 1 - static_cast<double>(((i + 32) % 64)) / 32.; },
+	[](size_t i) { return i < 32 ? 1. : -1.; }
+};
+
 string byte2hexstr(byte b) {
 	constexpr char hex[] = "0123456789ABCDEF";
 	string ret;
@@ -54,9 +60,11 @@ double note2period(byte note, int finetune, bool linear) {
 	if (linear)
 		return 7680. - note * 64. - finetune / 2.;
 
-	return period_tab[note % 12 * 8 + ift] * (1 - (ft - ift))
-	     + period_tab[note % 12 * 8 + ift] * (ft - ift)
-	     * 16. * std::pow(2., note / 2);
+	// https://github.com/danielepiccone/xm_file/blob/main/xm.txt
+	// versiunea din README are un bug
+	return (period_tab[note % 12 * 8 + ift] * (1 - (ft - ift))
+	      + period_tab[note % 12 * 8 + ift + 1] * (ft - ift))
+	     * 16. / std::pow(2., note / 12);
 }
 
 double period2freq(double period, bool linear) {
