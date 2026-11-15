@@ -55,6 +55,7 @@ string arr2str(const array<T, n> &arr) {
 string byte2hexstr(byte);
 string note2str(byte);
 string effect2str(byte, byte);
+string volumecol2str(byte);
 double note2period(byte, int, bool);
 double period2freq(double, bool);
 

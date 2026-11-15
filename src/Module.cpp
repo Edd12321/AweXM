@@ -30,6 +30,13 @@ ostream &operator<<(ostream &out, const Module &rhs) {
 	out << "Restart position: " << rhs.get_restart_position() << '\n';
 	out << "Default tempo: " << rhs.get_default_tempo() << '\n';
 	out << "Default BPM: " << rhs.get_default_bpm() << '\n';
+	out << '\n';
+
+	out << "Pattern order table: ";
+	for (auto const &it : rhs.get_pattern_order_table())
+		out << static_cast<int>(it) << ' ';
+	out << "\n\n";
+
 	out << "PATTERNS\n--------\n";
 	size_t k = 0;
 	for (const auto &it : rhs.pats)

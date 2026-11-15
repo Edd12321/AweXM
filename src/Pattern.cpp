@@ -50,8 +50,8 @@ ostream &operator<<(ostream &out, const Pattern &rhs) {
 		for (const auto &jt : it) {
 			out << note2str(jt.note) << ' '
 			    << (jt.instrument ? byte2hexstr(jt.instrument) : "..") << ' '
-			    << (jt.volume_column_byte ? byte2hexstr(jt.volume_column_byte) : "..") << ' '
-			    << effect2str(jt.effect_type, jt.effect_parameter) << " |\t";
+			    << volumecol2str(jt.volume_column_byte) << ' '
+			    << effect2str(jt.effect_type, jt.effect_parameter) << " | ";
 		}
 		out << '\n';
 	}

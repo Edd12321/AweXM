@@ -45,6 +45,27 @@ string effect2str(byte effect_type, byte effect_parameter) {
 	return ret;
 }
 
+string volumecol2str(byte V) {
+	if (!V)
+		return "..";
+	if (V >= 0x10 && V <= 0x50)
+		return byte2hexstr(V);
+	char c = '?';
+	switch (V & 0xF0) {
+	case 0x60: c = '-'; break;
+	case 0x70: c = '+'; break;
+	case 0x80: c = 'D'; break;
+	case 0x90: c = 'U'; break;
+	case 0xA0: c = 'S'; break;
+	case 0xB0: c = 'V'; break;
+	case 0xC0: c = 'P'; break;
+	case 0xD0: c = 'L'; break;
+	case 0xE0: c = 'R'; break;
+	case 0xF0: c = 'M'; break;
+	}
+	return string(1, c) + byte2hexstr(V & 0x0F)[1];
+}
+
 double note2period(byte note, int finetune, bool linear) {
 	// all of this is from xm-form.txt
 	static constexpr double period_tab[] = {
