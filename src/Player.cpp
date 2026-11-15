@@ -172,7 +172,7 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 			break;
 		case 0xC:
 			/* Note cut (#1) */ {
-				if (tick == xx)
+				if (tick == y)
 					out.volume = 0;
 			}
 			break;
@@ -300,7 +300,7 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 			break;
 		case 0xC:
 			/* Note cut (#2) */ {
-				if (tick == xx)
+				if (tick == y)
 					out.volume = 0;
 			}
 			break;
