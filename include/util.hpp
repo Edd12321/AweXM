@@ -14,6 +14,7 @@
 #include <string>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace AweXM {
@@ -30,6 +31,7 @@ using std::size_t;
 using std::array;
 using std::istream;
 using std::ostream;
+using std::pair;
 using std::string;
 using std::vector;
 

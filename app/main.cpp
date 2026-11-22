@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 			p.load(mod);
 			p.play();
 		} else {
-			std::cerr << "usage: dump|play " << argv[0] << " <file>\n";
+			std::cerr << "usage: " << argv[0] << " dump|play <file>\n";
 			return EXIT_SUCCESS; // EXIT_FAILURE;
 		}
 	} catch (const std::exception &err) {

@@ -384,10 +384,11 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 
 
 			// mixare
+			double P = ch.panning / 256.;
 			L += ch.sample->get_data()[sample_pos]
-				* (ch.volume / 64.) * (global_volume / 64.) * (1. - ch.panning / 255.);
+				* (ch.volume / 64.) * (global_volume / 64.) * std::sqrt(1. - P);
 			R += ch.sample->get_data()[sample_pos]
-				* (ch.volume / 64.) * (global_volume / 64.) * (ch.panning / 255.);
+				* (ch.volume / 64.) * (global_volume / 64.) * std::sqrt(P);
 
 			// avansare in sample in fct de viteza
 			ch.sample_pos += ch.loop_dir * period2freq(ch.period + ch.p_temp , m->get_linear()) / rate;
