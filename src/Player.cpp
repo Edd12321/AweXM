@@ -182,14 +182,16 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 			}
 			break;
 		default:
-			std::cerr << "Unimplemented E" << byte2hexstr(x)[1] << '\n';
+			if (!nice_mode)
+				std::cerr << "Unimplemented E" << byte2hexstr(x)[1] << '\n';
 			break;
 		}
 		break;
 	case 'F':
 		/* Set speed */ {
 			if (xx == 0) {
-				std::cerr << "invalid F arg " << xx << '\n';
+				if (!nice_mode)
+					std::cerr << "invalid F arg " << xx << '\n';
 				break;
 			}
 			if (xx <= 31)
@@ -209,7 +211,8 @@ void Player::process_cell_tick0_eff(const Pattern::Cell &cell, ChannelState &out
 		}
 		break;
 	default:
-		std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
+		if (!nice_mode)
+			std::cerr << "Unknown effect " << static_cast<char>(E) << '\n';
 		break;
 	}
 }
@@ -340,22 +343,29 @@ void Player::process_cell_rest_eff(const Pattern::Cell &cell, ChannelState &out,
 			break;
 		}
 	default:
-		std::cerr << "Unknown effect " << static_cast<char>(E) <<'\n';
+		if (!nice_mode)
+			std::cerr << "Unknown effect " << static_cast<char>(E) <<'\n';
 		break;
 	}
 }
 
-void Player::play(double rate) {
-	constexpr size_t cnt = 512;
-	vector<sword> buf(2 * cnt);
+void Player::play(size_t framecnt, double rate, bool nice) {
+	vector<vector<sword>> buf(framecnt);
+	auto nc = m->get_number_of_channels();
+	if ((nice_mode = nice)) {
+		std::cout << nc << '\n';
+		std::cout.flush();
+	}
+	for (auto &f : buf)
+		f.resize(2 + nice * nc);
 	for (;;) {
-		render(buf.data(), cnt, rate);
+		render(buf, framecnt, rate);
 		binwrite(std::cout, buf);
 		std::cout.flush();
 	}
 }
 
-void Player::render(sword *out, size_t framecnt, double rate) {
+void Player::render(vector<vector<sword>> &out, size_t framecnt, double rate) {
 	for (size_t i = 0; i < framecnt; ++i, --frames_til_tick) {
 		// un row contine mai multe tickuri si un tick mai multe frameuri stereo
 		// cat de multe frameuri stereo incap intr-un tick?
@@ -371,7 +381,8 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 			frames_til_tick += 2.5 * rate / bpm;
 		}
 		double L = 0, R = 0;
-		for (auto &ch : chst) {
+		for (size_t j = 0; j < chst.size(); ++j) {
+			auto &ch = chst[j];
 			if (!ch.active || !ch.sample)
 				continue;
 			if (ch.sample->get_data().empty()) {
@@ -385,10 +396,11 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 
 			// mixare
 			double P = ch.panning / 256.;
-			L += ch.sample->get_data()[sample_pos]
-				* (ch.volume / 64.) * (global_volume / 64.) * std::sqrt(1. - P);
-			R += ch.sample->get_data()[sample_pos]
-				* (ch.volume / 64.) * (global_volume / 64.) * std::sqrt(P);
+			double O = ch.sample->get_data()[sample_pos] * (ch.volume / 64.);
+			L += O * (global_volume / 64.) * std::sqrt(1. - P);
+			R += O * (global_volume / 64.) * std::sqrt(P);
+			if (nice_mode && out[i].size() > 2)
+				out[i][j + 2] = static_cast<sword>(std::min(std::max(-32768L, std::lround(O)), 32767L));
 
 			// avansare in sample in fct de viteza
 			ch.sample_pos += ch.loop_dir * period2freq(ch.period + ch.p_temp , m->get_linear()) / rate;
@@ -418,8 +430,8 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 			}
 		}
 		double nc = m->get_number_of_channels();
-		out[2 * i] = static_cast<sword>(std::min(std::max(-32768L, std::lround(L / nc)), 32767L));
-		out[2 * i + 1] = static_cast<sword>(std::min(std::max(-32768L, std::lround(R / nc)), 32767L));
+		out[i][0] = static_cast<sword>(std::min(std::max(-32768L, std::lround(L / nc)), 32767L));
+		out[i][1] = static_cast<sword>(std::min(std::max(-32768L, std::lround(R / nc)), 32767L));
 	}
 }
 
@@ -429,9 +441,12 @@ void Player::advance() {
 
 	const auto &pot = m->get_pattern_order_table();
 	const auto &T = m->get_patterns()[pot[song_pos]].get_table();
-
+	if (nice_mode && first_tick)
+		std::cerr << " | ";
 	for (size_t i = 0; i < chst.size(); ++i) {
 		auto &state = chst[i];
+		if (nice_mode && first_tick)
+			std::cerr << state.cell << " |";
 		if (first_tick) {
 			state.cell = T[row][i];
 			state.cell.effect_type = T[row][i].effect_type;
@@ -484,7 +499,8 @@ void Player::advance() {
 			break;
 		case 0xB0:
 			/* (Vx) Vibrato */
-			std::cerr << "Unimplemented Vx\n";
+			if (!nice_mode)
+				std::cerr << "Unimplemented Vx\n";
 			break;
 		case 0xC0:
 			/* (Px) Set panning position */ {
@@ -523,13 +539,18 @@ void Player::advance() {
 			E = static_cast<char>(state.cell.effect_type + '0');
 		else if (state.cell.effect_type <= 0x21)
 			E = static_cast<char>(state.cell.effect_type - 0xA + 'A');
-		else std::cerr << "warning: bad effect " << state.cell.effect_type << '\n';
+		else if (!nice_mode)
+			std::cerr << "warning: bad effect " << state.cell.effect_type << '\n';
 		byte xx = state.cell.effect_parameter;
 		byte x = xx >> 4, y = xx & 0x0F;
 		effmem_handle(state, E, xx, x, y);
 		if (first_tick)
 			process_cell_tick0_eff(state.cell, state, E, xx, x, y);
 		else process_cell_rest_eff(state.cell, state, E, xx, x, y);
+	}
+	if (nice_mode && first_tick) {
+		std::cerr << '\n';
+		std::cerr.flush();
 	}
 
 	// from pollak.thebe.de/b/the-xm-format:

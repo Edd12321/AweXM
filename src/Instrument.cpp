@@ -15,10 +15,10 @@ Instrument::Instrument(const BinInstrument &i) : h(i.instrument_header) {
 	vol_env.resize(nv);
 	const auto &P = h.points_for_panning_envelope;
 	const auto &V = h.points_for_volume_envelope;
-	for (int i = 0; i < std::min(12, np); ++i)
-		pan_env[i] = {P[2 * i], P[2 * i + 1]};
-	for (int i = 0; i < std::min(12, nv); ++i)
-		vol_env[i] = {V[2 * i], V[2 * i + 1]};
+	for (int j = 0; j < std::min(12, np); ++j)
+		pan_env[j] = {P[2 * j], P[2 * j + 1]};
+	for (int j = 0; j < std::min(12, nv); ++j)
+		vol_env[j] = {V[2 * j], V[2 * j + 1]};
 }
 
 string Instrument::get_name() const {
@@ -38,12 +38,14 @@ vector<pair<sword, sword>> const &Instrument::get_volume_envelope() const noexce
 vector<pair<sword, sword>> const &Instrument::get_panning_envelope() const noexcept {
 	return pan_env;
 }
+/*
 size_t Instrument::get_number_of_volume_points() const noexcept {
 	return h.number_of_volume_points;
 }
 size_t Instrument::get_number_of_panning_points() const noexcept {
 	return h.number_of_panning_points;
 }
+*/
 size_t Instrument::get_volume_sustain_point() const noexcept {
 	return h.volume_sustain_point;
 }

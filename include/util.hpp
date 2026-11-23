@@ -1,5 +1,6 @@
 #ifndef AWEXM_UTIL_HPP
 #define AWEXM_UTIL_HPP
+#include <ctime>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -35,20 +36,20 @@ using std::pair;
 using std::string;
 using std::vector;
 
-extern array<double(*)(size_t), 3> wave;
-
 template<typename T>
-struct has_data {
+struct is_collection {
 	static constexpr bool value = false;
 };
 template<typename T>
-struct has_data<std::vector<T>> {
+struct is_collection<vector<T>> {
 	static constexpr bool value = true;
 };
 template<typename T, std::size_t n>
-struct has_data<std::array<T, n>> {
+struct is_collection<array<T, n>> {
 	static constexpr bool value = true;
 };
+
+extern array<double(*)(size_t), 3> wave;
 
 template<typename T, size_t n>
 string arr2str(const array<T, n> &arr) {
@@ -62,19 +63,18 @@ string volumecol2str(byte);
 double note2period(byte, int, bool);
 double period2freq(double, bool);
 
-#define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, before, after)                       \
-template<typename T, typename = typename std::enable_if<!has_data<T>::value>::type> \
-void bin##oper(std::stream &s, T &dst, std::streamsize len = sizeof(T)) {           \
-    before;                                                                         \
-    s.oper(reinterpret_cast<C>(&dst), len);                                         \
-    after;                                                                          \
-}                                                                                   \
-                                                                                    \
-template<typename T, typename = typename std::enable_if<has_data<T>::value>::type>  \
-void bin##oper(std::stream &s, T &dst) {                                            \
-    if (dst.empty())                                                                \
-        return;                                                                     \
-    bin##oper(s, *dst.data(), dst.size() * sizeof(typename T::value_type));         \
+#define AWEXM_DRY_AVOIDER_DEF(oper, stream, C, before, after)                            \
+template<typename T, typename = typename std::enable_if<!is_collection<T>::value>::type> \
+void bin##oper(std::stream &s, T &dst, std::streamsize len = sizeof(T)) {                \
+    before;                                                                              \
+    s.oper(reinterpret_cast<C>(&dst), len);                                              \
+    after;                                                                               \
+}                                                                                        \
+                                                                                         \
+template<typename T, typename = typename std::enable_if<is_collection<T>::value>::type>  \
+void bin##oper(std::stream &s, T &dst) {                                                 \
+    for (auto &it : dst)                                                                 \
+        bin##oper(s, it);                                                                \
 }
 
 AWEXM_DRY_AVOIDER_DEF(write, ostream, const char*

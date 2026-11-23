@@ -25,6 +25,8 @@ public:
 	friend ostream &operator<<(ostream&, const Pattern&);
 };
 
+ostream &operator<<(ostream&, const Pattern::Cell&);
+
 }
 
 #endif // AWEXM_PATTERN_HPP

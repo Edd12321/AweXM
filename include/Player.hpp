@@ -9,6 +9,8 @@ namespace AweXM {
 class Player {
 private:
 	const Module *m = nullptr;
+	bool nice_mode = false;
+
 	double frames_til_tick{};
 
 	size_t tick{};
@@ -51,8 +53,8 @@ public:
 	void load(const Module &md);
 	static void effmem_handle(ChannelState&, int, byte&, byte&, byte&);
 
-	void play(double rate = 48000);
-	void render(sword*, size_t, double rate = 48000);
+	void play(size_t framecnt = 512, double rate = 48000, bool nice = false);
+	void render(vector<vector<sword>>&, size_t, double rate);
 	void advance();
 	void process_cell_tick0_init(const Pattern::Cell&, ChannelState&, bool portamento = false);
 	void process_cell_tick0_eff(const Pattern::Cell&, ChannelState&, int, byte, byte, byte);

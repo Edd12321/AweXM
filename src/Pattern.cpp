@@ -42,17 +42,19 @@ Pattern::Pattern(const BinXMHeader &h, const BinPattern &p) {
 	}
 }
 
-
+ostream &operator<<(ostream &out, const Pattern::Cell &jt) {
+	out << note2str(jt.note) << ' '
+	    << (jt.instrument ? byte2hexstr(jt.instrument) : "..") << ' '
+	    << volumecol2str(jt.volume_column_byte) << ' '
+	    << effect2str(jt.effect_type, jt.effect_parameter);
+	return out;
+}
 
 ostream &operator<<(ostream &out, const Pattern &rhs) {
 	for (const auto &it : rhs.get_table()) {
 		out << "| ";
-		for (const auto &jt : it) {
-			out << note2str(jt.note) << ' '
-			    << (jt.instrument ? byte2hexstr(jt.instrument) : "..") << ' '
-			    << volumecol2str(jt.volume_column_byte) << ' '
-			    << effect2str(jt.effect_type, jt.effect_parameter) << " | ";
-		}
+		for (const auto &jt : it)
+			out << jt << " | ";
 		out << '\n';
 	}
 	return out;
