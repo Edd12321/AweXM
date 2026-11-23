@@ -1,4 +1,4 @@
-<img src="assets/logo.png" height=70 height=auto />
+<img src="assets/logo.png" alt="AweXM" height=70 />
 
 *AweXM* is a ~~soon to be~~ tracker for the XM (eXtended Module) sample-based music format, written for my uni's OOP course. The structure of the program is different from what I usually write (e. g. it has CMake, AGENTS.md, GitHub Actions, AGPL license) because it uses a template.
 
@@ -8,10 +8,13 @@ Documentation I used:
  - https://pollak.thebe.de/b/the-xm-format/;
  - https://www.a1k0n.net/2015/11/09/javascript-ft2-player.html.
 
-It currently supports basic playback via `ffplay`, and some modules sound okay as of right now. There are missing effects, though. To play an .xm file, issue:
+It currently supports basic playback via `ffmpeg` and `ffplay`, and some modules sound okay as of right now. There are missing effects, though. To play an .xm file, issue:
 ```
 $ assets/play.sh <path to xm file>
 ```
+
+The following documents already-existing `ffplay` behaviour (I didn't code it myself): To change the visualisation between (custom duct-taped oscilloscope)/(DFT)/(stereo waves), use the w key. To quit, use the q key. To pause, use the spacebar. To skip, right-click or use the arrow keys. All of these key obviously only work if you have the `ffplay` window selected.
+
 Cool tracks I recommend testing this player with:
 - Drozerix vs LHS [#1](https://modarchive.org/index.php?request=view_by_moduleid&query=176125) and [#2](https://modarchive.org/index.php?request=view_by_moduleid&query=174244);
 - [Kenet & Rez - Unreeeal Superhero 3](https://modarchive.org/index.php?request=view_by_moduleid&query=149252);
@@ -22,8 +25,8 @@ Tracks that currently sound bad (effects not supported properly):
 - [Fearofdark - Rollin' Down The Street, In My Katamari](https://modarchive.org/index.php?request=view_by_moduleid&query=169549) (I think this is due to a lack of envelope/fade-out support);
 - [Zabutom - Final Blast](https://modarchive.org/index.php?request=view_by_moduleid&query=205574) (the bass sounds fine but there is no lead melody).
 
-
-Below is the rest of the original template's README, in Romanian.
+<details>
+<summary>**Original template's README (Romanian language)**</summary>
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
@@ -232,3 +235,4 @@ The [template repository](https://github.com/mcmarius/oop-template) itself is li
 ## Resurse
 
 - adăugați trimiteri **detaliate** către resursele externe care v-au ajutat sau pe care le-ați folosit
+</details>
