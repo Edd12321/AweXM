@@ -417,8 +417,9 @@ void Player::render(sword *out, size_t framecnt, double rate) {
 				break;
 			}
 		}
-		out[2 * i] = static_cast<sword>(std::min(std::max(-32768L, std::lround(L)), 32767L));
-		out[2 * i + 1] = static_cast<sword>(std::min(std::max(-32768L, std::lround(R)), 32767L));
+		double nc = m->get_number_of_channels();
+		out[2 * i] = static_cast<sword>(std::min(std::max(-32768L, std::lround(L / nc)), 32767L));
+		out[2 * i + 1] = static_cast<sword>(std::min(std::max(-32768L, std::lround(R / nc)), 32767L));
 	}
 }
 
