@@ -25,10 +25,10 @@ awexm_main dump "$1" > /dev/null && {
 			-f s16le -ar 48000 -ch_layout "${T} channels" -i pipe:0 \
 			-filter_complex "
 				[0:a]pan=stereo|c0=c0|c1=c1[out1];
-				[0:a]pan=${n}C${str},showwaves=mode=p2p:split_channels=1:s=1800x720[out0]
+				[0:a]pan=${n}C${str},showwaves=mode=p2p:split_channels=1:r=120:s=1200x480:colors=lime[out0]
 			" \
 			-map "[out0]" -map "[out1]" \
-			-c:v rawvideo -pix_fmt rgb24 \
+			-c:v rawvideo -pix_fmt yuv420p \
 			-c:a pcm_s16le -f nut - | ffplay >/dev/null 2>/dev/null -autoexit -i pipe:0 -x 600 -y 240
 	}
 }

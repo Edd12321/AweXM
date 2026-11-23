@@ -353,6 +353,8 @@ void Player::play(size_t framecnt, double rate, bool nice) {
 	vector<vector<sword>> buf(framecnt);
 	auto nc = m->get_number_of_channels();
 	if ((nice_mode = nice)) {
+		std::cerr << cursor_bottom_left;
+
 		std::cout << nc << '\n';
 		std::cout.flush();
 	}
@@ -446,7 +448,7 @@ void Player::advance() {
 	for (size_t i = 0; i < chst.size(); ++i) {
 		auto &state = chst[i];
 		if (nice_mode && first_tick)
-			std::cerr << state.cell << " |";
+			std::cerr << state.cell << " | ";
 		if (first_tick) {
 			state.cell = T[row][i];
 			state.cell.effect_type = T[row][i].effect_type;
@@ -548,10 +550,8 @@ void Player::advance() {
 			process_cell_tick0_eff(state.cell, state, E, xx, x, y);
 		else process_cell_rest_eff(state.cell, state, E, xx, x, y);
 	}
-	if (nice_mode && first_tick) {
+	if (nice_mode && first_tick)
 		std::cerr << '\n';
-		std::cerr.flush();
-	}
 
 	// from pollak.thebe.de/b/the-xm-format:
 	first_tick = false;
@@ -567,6 +567,8 @@ void Player::advance() {
 		if (row_jump || pattern_break)
 			row = row_jump_target;
 		if (pattern_break) {
+			if (nice_mode)
+				std::cerr << cursor_bottom_left;
 			song_pos = new_song_pos;
 			if (song_pos >= m->get_song_length())
 				song_pos = m->get_restart_position();

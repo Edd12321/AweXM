@@ -52,7 +52,7 @@ ostream &operator<<(ostream &out, const Pattern::Cell &jt) {
 
 ostream &operator<<(ostream &out, const Pattern &rhs) {
 	for (const auto &it : rhs.get_table()) {
-		out << "| ";
+		out << " | ";
 		for (const auto &jt : it)
 			out << jt << " | ";
 		out << '\n';

@@ -56,6 +56,8 @@ string arr2str(const array<T, n> &arr) {
 	return {arr.begin(), std::find(arr.begin(), arr.end(), '\0')};
 }
 
+static constexpr char cursor_bottom_left[] = "\033[2J\033[999;1H";
+
 string byte2hexstr(byte);
 string note2str(byte);
 string effect2str(byte, byte);

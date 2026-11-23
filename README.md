@@ -8,7 +8,19 @@ Documentation I used:
  - https://pollak.thebe.de/b/the-xm-format/;
  - https://www.a1k0n.net/2015/11/09/javascript-ft2-player.html.
 
-It currently supports basic playback via `ffplay`, and some modules sound okay as of right now. There are missing effects, though.
+It currently supports basic playback via `ffplay`, and some modules sound okay as of right now. There are missing effects, though. To play an .xm file, issue:
+```
+$ assets/play.sh <path to xm file>
+```
+Cool tracks I recommend testing this player with:
+- Drozerix vs LHS [#1](https://modarchive.org/index.php?request=view_by_moduleid&query=176125) and [#2](https://modarchive.org/index.php?request=view_by_moduleid&query=174244);
+- [Kenet & Rez - Unreeeal Superhero 3](https://modarchive.org/index.php?request=view_by_moduleid&query=149252);
+- [Dubmood - Insert No Coins](https://modarchive.org/index.php?request=view_by_moduleid&query=182917);
+- [Zalza - My Dirty Old Kamel](https://modarchive.org/index.php?request=view_by_moduleid&query=154017);
+
+Tracks that currently sound bad (effects not supported properly):
+- [Fearofdark - Rollin' Down The Street, In My Katamari](https://modarchive.org/index.php?request=view_by_moduleid&query=169549) (I think this is due to a lack of envelope/fade-out support);
+- [Zabutom - Final Blast](https://modarchive.org/index.php?request=view_by_moduleid&query=205574) (the bass sounds fine but there is no lead melody).
 
 
 Below is the rest of the original template's README, in Romanian.
